@@ -32,11 +32,13 @@ Repeated builds are cached by default:
 - `/ccache` is a Docker named volume used by `CONFIG_CCACHE=y`.
 - The Dockerfile uses BuildKit cache mounts for apt metadata and downloaded
   `.deb` files.
+- `/usr/local/go` in the builder image is used as the external Go bootstrap,
+  which is needed for Go packages such as `tailscale` on Apple Silicon.
 
 ## Recommended CM5 Command
 
 ```sh
-IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan" \
+IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan tailscale" \
 ./scripts/build-immortalwrt-macos.sh \
   --source /Users/t-rex-xp/Documents/immortalwrt \
   --device xunlong_orangepi-cm5-base \

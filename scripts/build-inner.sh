@@ -145,6 +145,14 @@ CONFIG_CCACHE=y
 CFG
 fi
 
+if [[ -x /usr/local/go/bin/go ]]; then
+	cat >> .config <<'CFG'
+# CONFIG_GOLANG_BUILD_BOOTSTRAP is not set
+CONFIG_GOLANG_EXTERNAL_BOOTSTRAP_ROOT="/usr/local/go"
+CONFIG_GOLANG_BUILD_CACHE_DIR="/ccache/go-build"
+CFG
+fi
+
 make defconfig
 
 profile_config="CONFIG_TARGET_${TARGET}_${SUBTARGET}_DEVICE_${DEVICE}=y"

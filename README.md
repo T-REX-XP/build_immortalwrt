@@ -115,5 +115,8 @@ list:
   survive between runs.
 - The builder Dockerfile uses BuildKit cache mounts for apt package metadata and
   downloaded `.deb` files, so rebuilding the builder image is quicker too.
-- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan"` if you want
+- The builder image includes `/usr/local/go` and the generated OpenWrt config
+  points `CONFIG_GOLANG_EXTERNAL_BOOTSTRAP_ROOT` at it. This avoids building
+  `golang-bootstrap`, which is not supported on Linux arm64 Docker hosts.
+- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan tailscale"` if you want
   the build to fail when those packages are missing from the final manifest.
