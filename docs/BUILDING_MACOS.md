@@ -43,7 +43,7 @@ Repeated builds are cached by default:
 ## Recommended CM5 Command
 
 ```sh
-IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky luci-app-blocky luci-app-security-guide transmission luci-app-transmission docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg" \
+IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky luci-app-blocky luci-app-security-guide luci-app-peripherals transmission-daemon luci-app-transmission docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg" \
 ./scripts/build-immortalwrt-macos.sh \
   --source /Users/t-rex-xp/Documents/immortalwrt \
   --device xunlong_orangepi-cm5-base \
@@ -69,6 +69,13 @@ IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale clo
 - `luci-app-security-guide` provides a static `Network -> Security Guide` page
   with external links for DNS leak, IP, browser leak, ad-block, IPv6, TLS, and
   firewall exposure checks.
+- `luci-app-peripherals` provides the `System -> Peripherals` UI for button
+  scripts, infrared receiver/keymap management, PWM fan control, and module
+  diagnostics.
+- The CM5 kernel DTS enables eMMC through `sdhci`, and U-Boot is patched to try
+  eMMC before microSD. The generated image is suitable for flashing to either
+  microSD or eMMC; remove the microSD card after flashing eMMC if you want the
+  board to boot from eMMC.
 
 ## Cache Control
 
