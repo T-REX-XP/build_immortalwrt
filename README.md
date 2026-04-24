@@ -110,6 +110,8 @@ list:
   products go to the `--out-dir`.
 - The download cache is mounted at `/dl` and linked as `dl/` inside the copied
   tree, so repeated builds reuse source tarballs.
+- `scripts/feeds.conf.cm5` includes the extra `awgopenwrt` feed for AmneziaWG
+  packages in addition to ImmortalWrt `packages` and `luci`.
 - The default `/work` Docker volume is much faster than rebuilding from a fresh
   container because OpenWrt's `build_dir`, `staging_dir`, `tmp`, and feeds clones
   survive between runs.
@@ -121,5 +123,5 @@ list:
 - The generated config sets `CONFIG_TARGET_ROOTFS_PARTSIZE=512` by default so
   the Docker-enabled CM5 image has enough ext4 rootfs space. Override it with
   `IMMORTALWRT_ROOTFS_PARTSIZE` if you need a different size in MiB.
-- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard"` if you want
+- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg"` if you want
   the build to fail when those packages are missing from the final manifest.

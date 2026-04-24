@@ -30,6 +30,8 @@ Repeated builds are cached by default:
 - `/work` is a Docker named volume that preserves `build_dir/`, `staging_dir/`,
   `tmp/`, and feeds between runs.
 - `/ccache` is a Docker named volume used by `CONFIG_CCACHE=y`.
+- `scripts/feeds.conf.cm5` adds the third-party `awgopenwrt` feed for
+  AmneziaWG packages.
 - The Dockerfile uses BuildKit cache mounts for apt metadata and downloaded
   `.deb` files.
 - `/usr/local/go` in the builder image is used as the external Go bootstrap,
@@ -41,7 +43,7 @@ Repeated builds are cached by default:
 ## Recommended CM5 Command
 
 ```sh
-IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard" \
+IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg" \
 ./scripts/build-immortalwrt-macos.sh \
   --source /Users/t-rex-xp/Documents/immortalwrt \
   --device xunlong_orangepi-cm5-base \
