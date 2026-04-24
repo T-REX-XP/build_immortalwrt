@@ -140,7 +140,12 @@ if ! docker version >/dev/null 2>&1; then
 fi
 
 if [[ "$BUILD_IMAGE" == "1" ]]; then
-	docker build "${DOCKER_BUILD_ARGS[@]}" -t "$IMAGE" -f "$SCRIPT_DIR/Dockerfile" "$SCRIPT_DIR"
+	docker_build_cmd=(docker build)
+	if [[ ${#DOCKER_BUILD_ARGS[@]} -gt 0 ]]; then
+		docker_build_cmd+=("${DOCKER_BUILD_ARGS[@]}")
+	fi
+	docker_build_cmd+=(-t "$IMAGE" -f "$SCRIPT_DIR/Dockerfile" "$SCRIPT_DIR")
+	"${docker_build_cmd[@]}"
 fi
 
 docker_args=(
