@@ -64,6 +64,8 @@ IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale clo
   port `4000`. This lets Blocky start without fighting `dnsmasq` for port `53`;
   clients will only use Blocky automatically if DNS forwarding is configured
   separately, such as forwarding `dnsmasq` to `127.0.0.1#5353`.
+- Prometheus metrics are enabled at `/metrics` on the same HTTP/API listener so
+  the LuCI Blocky dashboard can show overview counters after first boot.
 
 ## Cache Control
 

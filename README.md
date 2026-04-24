@@ -140,3 +140,6 @@ list:
   `4000`. This avoids a DNS port conflict with `dnsmasq`, but LAN clients will
   not automatically use Blocky unless DNS forwarding is configured separately,
   for example by forwarding `dnsmasq` to `127.0.0.1#5353`.
+- The default Blocky config enables Prometheus metrics at `/metrics` on the
+  same HTTP/API listener so `luci-app-blocky` can show overview counters without
+  requiring a separate metrics service.
