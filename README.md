@@ -118,5 +118,5 @@ list:
 - The builder image includes `/usr/local/go` and the generated OpenWrt config
   points `CONFIG_GOLANG_EXTERNAL_BOOTSTRAP_ROOT` at it. This avoids building
   `golang-bootstrap`, which is not supported on Linux arm64 Docker hosts.
-- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan tailscale"` if you want
+- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared"` if you want
   the build to fail when those packages are missing from the final manifest.
