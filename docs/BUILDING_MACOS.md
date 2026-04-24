@@ -66,7 +66,7 @@ IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale clo
   separately, such as forwarding `dnsmasq` to `127.0.0.1#5353`.
 - Prometheus metrics are enabled at `/metrics` on the same HTTP/API listener so
   the LuCI Blocky dashboard can show overview counters after first boot.
-- `luci-app-security-guide` provides a static `Status -> Security Guide` page
+- `luci-app-security-guide` provides a static `Network -> Security Guide` page
   with external links for DNS leak, IP, browser leak, ad-block, IPv6, TLS, and
   firewall exposure checks.
 

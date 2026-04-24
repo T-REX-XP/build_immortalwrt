@@ -144,5 +144,5 @@ list:
   same HTTP/API listener so `luci-app-blocky` can show overview counters without
   requiring a separate metrics service.
 - The image includes `luci-app-security-guide`, a static LuCI page under
-  `Status -> Security Guide` with external links for DNS leak, IP, WebRTC,
+  `Network -> Security Guide` with external links for DNS leak, IP, WebRTC,
   ad-block, IPv6, TLS, and firewall exposure checks.
