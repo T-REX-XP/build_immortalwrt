@@ -123,5 +123,20 @@ list:
 - The generated config sets `CONFIG_TARGET_ROOTFS_PARTSIZE=512` by default so
   the Docker-enabled CM5 image has enough ext4 rootfs space. Override it with
   `IMMORTALWRT_ROOTFS_PARTSIZE` if you need a different size in MiB.
-- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg"` if you want
+- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky luci-app-blocky docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg"` if you want
   the build to fail when those packages are missing from the final manifest.
+
+## Image Assumptions
+
+- The CM5 image includes `luci-ssl`, so LuCI and `uhttpd` are expected to be
+  available after first boot.
+- The default LAN address is `192.168.8.1`; DHCP clients on LAN should receive
+  `192.168.8.x` addresses from the normal OpenWrt LAN DHCP pool.
+- The `blocky` package installs `/etc/blocky/config.yml` into the image. The
+  first-boot script at `/etc/uci-defaults/90-blocky-enable` only enables and
+  starts Blocky when `/etc/init.d/blocky` exists and that config file is
+  non-empty.
+- The default Blocky config listens for DNS on port `5353` and HTTP/API on port
+  `4000`. This avoids a DNS port conflict with `dnsmasq`, but LAN clients will
+  not automatically use Blocky unless DNS forwarding is configured separately,
+  for example by forwarding `dnsmasq` to `127.0.0.1#5353`.

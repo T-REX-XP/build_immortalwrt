@@ -43,12 +43,27 @@ Repeated builds are cached by default:
 ## Recommended CM5 Command
 
 ```sh
-IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg" \
+IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky luci-app-blocky docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg" \
 ./scripts/build-immortalwrt-macos.sh \
   --source /Users/t-rex-xp/Documents/immortalwrt \
   --device xunlong_orangepi-cm5-base \
   --dl-dir "$HOME/.cache/immortalwrt-dl"
 ```
+
+## CM5 Image Assumptions
+
+- `luci-ssl` is part of the device package list, so the flashed image should
+  expose LuCI through the standard OpenWrt web server after first boot.
+- The LAN interface uses `192.168.8.1`; DHCP clients should receive
+  `192.168.8.x` addresses from the normal LAN pool.
+- `blocky` installs `/etc/blocky/config.yml` at image build time. The first boot
+  script `/etc/uci-defaults/90-blocky-enable` only enables and starts the
+  service when `/etc/init.d/blocky` is executable and the config file is
+  present and non-empty.
+- Blocky listens on DNS port `5353` by default, while its HTTP/API endpoint uses
+  port `4000`. This lets Blocky start without fighting `dnsmasq` for port `53`;
+  clients will only use Blocky automatically if DNS forwarding is configured
+  separately, such as forwarding `dnsmasq` to `127.0.0.1#5353`.
 
 ## Cache Control
 
