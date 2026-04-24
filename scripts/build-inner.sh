@@ -33,20 +33,29 @@ echo "=== Copying source tree to Linux filesystem ==="
 rsync_args=(
 	-a
 	--delete
-	--exclude staging_dir/ \
-	--exclude build_dir/ \
-	--exclude tmp/ \
-	--exclude dl/ \
-	--exclude bin/ \
-	--exclude .config \
-	--exclude .config.old
+	--exclude /staging_dir/ \
+	--exclude /build_dir/ \
+	--exclude /tmp/ \
+	--exclude /dl/ \
+	--exclude /bin/ \
+	--exclude /.config \
+	--exclude /.config.old
 )
 
 if [[ "$CACHE_FEEDS" == "1" ]]; then
-	rsync_args+=(--exclude feeds/ --exclude package/feeds/)
+	rsync_args+=(--exclude /feeds/ --exclude /package/feeds/)
 fi
 
 rsync "${rsync_args[@]}" "$SOURCE"/ "$IWRT"/
+
+# Older wrapper versions excluded every directory named "bin", which left
+# tools/missing-macros/src/bin out of the copied tree and cached a broken
+# prepared host build. Repair that cache automatically on the next run.
+if [[ -d tools/missing-macros/src/bin && -d build_dir/host/missing-macros && ! -d build_dir/host/missing-macros/bin ]]; then
+	echo "Repairing cached tools/missing-macros build (missing src/bin from older rsync exclude)."
+	rm -rf build_dir/host/missing-macros
+	rm -f staging_dir/host/stamp/.missing-macros_installed
+fi
 
 cd "$IWRT"
 
