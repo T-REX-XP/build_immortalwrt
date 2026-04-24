@@ -1,0 +1,4 @@
+# Minimal feeds for the Orange Pi CM5 Base image.
+# Use build-immortalwrt-macos.sh --all-feeds to use the tree's feeds.conf.default instead.
+src-git packages https://github.com/immortalwrt/packages.git
+src-git luci https://github.com/immortalwrt/luci.git
