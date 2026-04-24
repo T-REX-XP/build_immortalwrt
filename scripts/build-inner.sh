@@ -12,6 +12,8 @@ TARGET="${IMMORTALWRT_TARGET:-rockchip}"
 SUBTARGET="${IMMORTALWRT_SUBTARGET:-armv8}"
 DEVICE="${IMMORTALWRT_DEVICE:-xunlong_orangepi-cm5-base}"
 TARGET_DIR="bin/targets/$TARGET/$SUBTARGET"
+USE_CCACHE="${IMMORTALWRT_USE_CCACHE:-1}"
+CACHE_FEEDS="${IMMORTALWRT_CACHE_FEEDS:-1}"
 
 BUILD_LOG="${IMMORTALWRT_BUILD_LOG:-immortalwrt-build.log}"
 if [[ "$BUILD_LOG" != /* ]]; then
@@ -23,24 +25,41 @@ trap '' PIPE
 
 echo "=== ImmortalWrt build log: $BUILD_LOG ==="
 echo "=== Target device: $TARGET/$SUBTARGET/$DEVICE ==="
+echo "=== Work cache: ${WORK_ROOT} (preserves build_dir/staging_dir/tmp across runs when mounted) ==="
 
 mkdir -p "$WORK_ROOT"
 
 echo "=== Copying source tree to Linux filesystem ==="
-rsync -a --delete \
+rsync_args=(
+	-a
+	--delete
 	--exclude staging_dir/ \
 	--exclude build_dir/ \
 	--exclude tmp/ \
 	--exclude dl/ \
 	--exclude bin/ \
 	--exclude .config \
-	--exclude .config.old \
-	"$SOURCE"/ "$IWRT"/
+	--exclude .config.old
+)
+
+if [[ "$CACHE_FEEDS" == "1" ]]; then
+	rsync_args+=(--exclude feeds/ --exclude package/feeds/)
+fi
+
+rsync "${rsync_args[@]}" "$SOURCE"/ "$IWRT"/
 
 cd "$IWRT"
 
 rm -rf dl
 ln -s /dl dl
+
+if [[ "$USE_CCACHE" == "1" ]]; then
+	mkdir -p /ccache
+	export CCACHE_DIR=/ccache
+	export CCACHE_COMPILERCHECK=content
+	ccache -M "${IMMORTALWRT_CCACHE_MAXSIZE:-20G}" >/dev/null || true
+	echo "Using ccache: $CCACHE_DIR ($(ccache -s | sed -n '1p'))"
+fi
 
 echo "=== Preparing feeds ==="
 if [[ -n "${IMMORTALWRT_FEEDS_CONF:-}" && -f "${IMMORTALWRT_FEEDS_CONF}" ]]; then
@@ -110,6 +129,12 @@ CONFIG_TARGET_${TARGET}_${SUBTARGET}=y
 CONFIG_TARGET_${TARGET}_${SUBTARGET}_DEVICE_${DEVICE}=y
 # CONFIG_TARGET_MULTI_PROFILE is not set
 CFG
+
+if [[ "$USE_CCACHE" == "1" ]]; then
+	cat >> .config <<'CFG'
+CONFIG_CCACHE=y
+CFG
+fi
 
 make defconfig
 

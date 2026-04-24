@@ -24,6 +24,15 @@ and copies artifacts to:
 /Users/t-rex-xp/Documents/immortalwrt/bin/targets/rockchip/armv8/
 ```
 
+Repeated builds are cached by default:
+
+- `/dl` is your source download cache.
+- `/work` is a Docker named volume that preserves `build_dir/`, `staging_dir/`,
+  `tmp/`, and feeds between runs.
+- `/ccache` is a Docker named volume used by `CONFIG_CCACHE=y`.
+- The Dockerfile uses BuildKit cache mounts for apt metadata and downloaded
+  `.deb` files.
+
 ## Recommended CM5 Command
 
 ```sh
@@ -32,6 +41,35 @@ IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan" \
   --source /Users/t-rex-xp/Documents/immortalwrt \
   --device xunlong_orangepi-cm5-base \
   --dl-dir "$HOME/.cache/immortalwrt-dl"
+```
+
+## Cache Control
+
+Use the defaults for normal rebuilds. To reset build state after large branch
+changes or strange compile errors:
+
+```sh
+./scripts/build-immortalwrt-macos.sh \
+  --source /Users/t-rex-xp/Documents/immortalwrt \
+  --reset-work-cache
+```
+
+Reset compiler cache too:
+
+```sh
+./scripts/build-immortalwrt-macos.sh \
+  --source /Users/t-rex-xp/Documents/immortalwrt \
+  --reset-work-cache \
+  --reset-ccache
+```
+
+Disable persistent work cache for a one-off clean build:
+
+```sh
+./scripts/build-immortalwrt-macos.sh \
+  --source /Users/t-rex-xp/Documents/immortalwrt \
+  --no-work-cache \
+  --no-ccache
 ```
 
 ## Debugging

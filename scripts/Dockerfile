@@ -1,10 +1,14 @@
+# syntax=docker/dockerfile:1.7
 # macOS builder image for ImmortalWrt/OpenWrt.
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV FORCE_UNSAFE_CONFIGURE=1
 
-RUN apt-get update \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+	--mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+	rm -f /etc/apt/apt.conf.d/docker-clean \
+	&& apt-get update \
 	&& apt-get install -y --no-install-recommends \
 		ack antlr3 asciidoc autoconf automake autopoint \
 		binutils bison build-essential bzip2 ca-certificates ccache clang cmake cpio curl \
@@ -15,8 +19,7 @@ RUN apt-get update \
 		lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full patch perl pkgconf \
 		python3 python3-dev python3-distutils python3-pip python3-ply python3-docutils \
 		python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig \
-		texinfo time uglifyjs unzip vim wget xmlto xxd xsltproc zlib1g-dev zstd \
-	&& rm -rf /var/lib/apt/lists/*
+		texinfo time uglifyjs unzip vim wget xmlto xxd xsltproc zlib1g-dev zstd
 
 WORKDIR /work
 

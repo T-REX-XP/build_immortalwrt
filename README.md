@@ -53,6 +53,24 @@ Use persistent caches outside the source tree:
   --out-dir "$HOME/immortalwrt-images"
 ```
 
+By default, repeated builds also use Docker named volumes for the Linux work
+tree and compiler cache:
+
+```text
+/work    -> preserves build_dir/, staging_dir/, tmp/, feeds/
+/ccache  -> compiler cache, enabled with CONFIG_CCACHE=y
+```
+
+Reset those caches when changing branches heavily or after suspicious build
+state:
+
+```sh
+./scripts/build-immortalwrt-macos.sh \
+  --source /path/to/immortalwrt \
+  --reset-work-cache \
+  --reset-ccache
+```
+
 Stop after `make defconfig`:
 
 ```sh
@@ -92,5 +110,10 @@ list:
   products go to the `--out-dir`.
 - The download cache is mounted at `/dl` and linked as `dl/` inside the copied
   tree, so repeated builds reuse source tarballs.
+- The default `/work` Docker volume is much faster than rebuilding from a fresh
+  container because OpenWrt's `build_dir`, `staging_dir`, `tmp`, and feeds clones
+  survive between runs.
+- The builder Dockerfile uses BuildKit cache mounts for apt package metadata and
+  downloaded `.deb` files, so rebuilding the builder image is quicker too.
 - Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan"` if you want
   the build to fail when those packages are missing from the final manifest.

@@ -15,6 +15,12 @@ IMAGE="${IMMORTALWRT_BUILDER_IMAGE:-immortalwrt-macos-builder:22.04}"
 DL_DIR="${IMMORTALWRT_DL_DIR:-}"
 OUT_DIR="${IMMORTALWRT_OUT_DIR:-}"
 FEEDS_CONF="${IMMORTALWRT_FEEDS_CONF:-$SCRIPT_DIR/feeds.conf.cm5}"
+WORK_VOLUME="${IMMORTALWRT_WORK_VOLUME:-}"
+CCACHE_VOLUME="${IMMORTALWRT_CCACHE_VOLUME:-}"
+USE_WORK_CACHE="${IMMORTALWRT_USE_WORK_CACHE:-1}"
+USE_CCACHE="${IMMORTALWRT_USE_CCACHE:-1}"
+RESET_WORK_CACHE=0
+RESET_CCACHE=0
 BUILD_IMAGE=1
 DOCKER_BUILD_ARGS=()
 
@@ -34,6 +40,12 @@ Options:
   --out-dir DIR         Artifact output dir (default: SOURCE/bin).
   --feeds-conf FILE     feeds.conf to use (default: scripts/feeds.conf.cm5).
   --all-feeds           Use the source tree's feeds.conf/feeds.conf.default.
+  --work-volume NAME    Docker volume for /work cache (default: derived from source/device).
+  --ccache-volume NAME  Docker volume for compiler cache (default: derived from source/device).
+  --no-work-cache       Use an ephemeral /work directory.
+  --no-ccache           Disable CONFIG_CCACHE and the ccache volume.
+  --reset-work-cache    Remove the selected /work cache volume before building.
+  --reset-ccache        Remove the selected ccache volume before building.
   --image NAME          Docker builder image tag.
   --no-build-image      Reuse an existing builder image.
   --docker-build-arg X  Extra argument passed to docker build.
@@ -45,6 +57,10 @@ Useful environment variables passed through to the container:
   IMMORTALWRT_SKIP_TARGET_BIN_CLEAN
   IMMORTALWRT_BUILD_LOG
   IMMORTALWRT_EXPECT_PACKAGES
+  IMMORTALWRT_USE_WORK_CACHE
+  IMMORTALWRT_USE_CCACHE
+  IMMORTALWRT_WORK_VOLUME
+  IMMORTALWRT_CCACHE_VOLUME
   IMMORTALWRT_PATCH_PYTHON3_EMAIL_KCONFIG
   IMMORTALWRT_PRUNE_BROKEN_FEED_PACKAGES
 USAGE
@@ -82,6 +98,30 @@ while [[ $# -gt 0 ]]; do
 			;;
 		--all-feeds)
 			FEEDS_CONF=""
+			shift
+			;;
+		--work-volume)
+			WORK_VOLUME="${2:-}"
+			shift 2
+			;;
+		--ccache-volume)
+			CCACHE_VOLUME="${2:-}"
+			shift 2
+			;;
+		--no-work-cache)
+			USE_WORK_CACHE=0
+			shift
+			;;
+		--no-ccache)
+			USE_CCACHE=0
+			shift
+			;;
+		--reset-work-cache)
+			RESET_WORK_CACHE=1
+			shift
+			;;
+		--reset-ccache)
+			RESET_CCACHE=1
 			shift
 			;;
 		--image)
@@ -148,11 +188,24 @@ if [[ "$BUILD_IMAGE" == "1" ]]; then
 	"${docker_build_cmd[@]}"
 fi
 
+cache_key="$(printf '%s\n%s\n%s\n%s\n' "$SOURCE" "$TARGET" "$SUBTARGET" "$DEVICE" | shasum -a 256 | awk '{print substr($1,1,16)}')"
+WORK_VOLUME="${WORK_VOLUME:-immortalwrt-work-$cache_key}"
+CCACHE_VOLUME="${CCACHE_VOLUME:-immortalwrt-ccache-$cache_key}"
+
+if [[ "$USE_WORK_CACHE" == "1" && "$RESET_WORK_CACHE" == "1" ]]; then
+	docker volume rm "$WORK_VOLUME" >/dev/null 2>&1 || true
+fi
+
+if [[ "$USE_CCACHE" == "1" && "$RESET_CCACHE" == "1" ]]; then
+	docker volume rm "$CCACHE_VOLUME" >/dev/null 2>&1 || true
+fi
+
 docker_args=(
 	--rm
 	-e "IMMORTALWRT_DEVICE=$DEVICE"
 	-e "IMMORTALWRT_TARGET=$TARGET"
 	-e "IMMORTALWRT_SUBTARGET=$SUBTARGET"
+	-e "IMMORTALWRT_USE_CCACHE=$USE_CCACHE"
 	-e "FORCE_UNSAFE_CONFIGURE=1"
 	-e "DEBIAN_FRONTEND=noninteractive"
 	-v "$SOURCE:/src:ro"
@@ -160,6 +213,14 @@ docker_args=(
 	-v "$OUT_DIR:/out"
 	-v "$SCRIPT_DIR:/scripts:ro"
 )
+
+if [[ "$USE_WORK_CACHE" == "1" ]]; then
+	docker_args+=(-v "$WORK_VOLUME:/work")
+fi
+
+if [[ "$USE_CCACHE" == "1" ]]; then
+	docker_args+=(-v "$CCACHE_VOLUME:/ccache")
+fi
 
 if [[ -n "$FEEDS_CONF" ]]; then
 	docker_args+=(-v "$FEEDS_CONF:/feeds.conf.custom:ro" -e "IMMORTALWRT_FEEDS_CONF=/feeds.conf.custom")
@@ -171,6 +232,7 @@ for var in \
 	IMMORTALWRT_SKIP_TARGET_BIN_CLEAN \
 	IMMORTALWRT_BUILD_LOG \
 	IMMORTALWRT_EXPECT_PACKAGES \
+	IMMORTALWRT_CACHE_FEEDS \
 	IMMORTALWRT_PATCH_PYTHON3_EMAIL_KCONFIG \
 	IMMORTALWRT_PRUNE_BROKEN_FEED_PACKAGES
 do
@@ -183,5 +245,15 @@ echo "Source:  $SOURCE"
 echo "Device:  $TARGET/$SUBTARGET/$DEVICE"
 echo "DL dir:  $DL_DIR"
 echo "Out dir: $OUT_DIR"
+if [[ "$USE_WORK_CACHE" == "1" ]]; then
+	echo "Work cache volume:   $WORK_VOLUME"
+else
+	echo "Work cache volume:   disabled"
+fi
+if [[ "$USE_CCACHE" == "1" ]]; then
+	echo "Compiler cache volume: $CCACHE_VOLUME"
+else
+	echo "Compiler cache volume: disabled"
+fi
 
 exec docker run "${docker_args[@]}" "$IMAGE" /bin/bash /scripts/build-inner.sh
