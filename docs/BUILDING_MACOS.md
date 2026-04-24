@@ -34,11 +34,14 @@ Repeated builds are cached by default:
   `.deb` files.
 - `/usr/local/go` in the builder image is used as the external Go bootstrap,
   which is needed for Go packages such as `tailscale` on Apple Silicon.
+- The generated OpenWrt config uses a 512 MiB rootfs partition by default. This
+  leaves enough ext4 space for Docker and can be overridden with
+  `IMMORTALWRT_ROOTFS_PARTSIZE`.
 
 ## Recommended CM5 Command
 
 ```sh
-IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky" \
+IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard" \
 ./scripts/build-immortalwrt-macos.sh \
   --source /Users/t-rex-xp/Documents/immortalwrt \
   --device xunlong_orangepi-cm5-base \
