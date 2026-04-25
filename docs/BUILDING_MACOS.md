@@ -75,6 +75,8 @@ IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale clo
 - `luci-app-buttons` provides a focused `System -> Buttons` UI for managing
   hotplug scripts under `/etc/rc.button/`, similar in placement to the standard
   LED configuration page.
+- `docs/FAN_BUTTON_DIAGNOSTICS.md` contains the manual SSH and LuCI validation
+  steps for PWM fan control and button hotplug support.
 - `speedtest-go` and `luci-app-speedtest` provide router-side internet speed
   testing from `Network -> Speed Test` and `Status -> Speed Test`.
 - The onboard CM5 Base IR receiver is not expected to create a

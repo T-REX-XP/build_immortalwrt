@@ -153,6 +153,8 @@ list:
 - The image also includes `luci-app-buttons` under `System -> Buttons` for a
   focused button-management page similar in placement to the standard LED
   configuration page. It edits hotplug scripts under `/etc/rc.button/`.
+- See `docs/FAN_BUTTON_DIAGNOSTICS.md` for the SSH and LuCI checks used to
+  validate PWM fan control and physical button hotplug handling.
 - The image includes `speedtest-go` and `luci-app-speedtest`. LuCI exposes it
   under `Network -> Speed Test` and `Status -> Speed Test`, running the router
   side speed test client and showing its raw output.
