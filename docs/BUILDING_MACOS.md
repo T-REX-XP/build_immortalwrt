@@ -43,7 +43,7 @@ Repeated builds are cached by default:
 ## Recommended CM5 Command
 
 ```sh
-IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky luci-app-blocky luci-app-security-guide luci-app-peripherals transmission-daemon luci-app-transmission docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg" \
+IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky luci-app-blocky luci-app-security-guide luci-app-peripherals luci-app-buttons speedtest-go luci-app-speedtest transmission-daemon luci-app-transmission docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg" \
 ./scripts/build-immortalwrt-macos.sh \
   --source /Users/t-rex-xp/Documents/immortalwrt \
   --device xunlong_orangepi-cm5-base \
@@ -66,12 +66,22 @@ IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale clo
   separately, such as forwarding `dnsmasq` to `127.0.0.1#5353`.
 - Prometheus metrics are enabled at `/metrics` on the same HTTP/API listener so
   the LuCI Blocky dashboard can show overview counters after first boot.
-- `luci-app-security-guide` provides a static `Network -> Security Guide` page
-  with external links for DNS leak, IP, browser leak, ad-block, IPv6, TLS, and
-  firewall exposure checks.
+- `luci-app-security-guide` provides static `Network -> Security Guide` and
+  `Status -> Security Guide` pages with external links for DNS leak, IP,
+  browser leak, ad-block, IPv6, TLS, and firewall exposure checks.
 - `luci-app-peripherals` provides the `System -> Peripherals` UI for button
   scripts, infrared receiver/keymap management, PWM fan control, and module
   diagnostics.
+- `luci-app-buttons` provides a focused `System -> Buttons` UI for managing
+  hotplug scripts under `/etc/rc.button/`, similar in placement to the standard
+  LED configuration page.
+- `speedtest-go` and `luci-app-speedtest` provide router-side internet speed
+  testing from `Network -> Speed Test` and `Status -> Speed Test`.
+- The onboard CM5 Base IR receiver is not expected to create a
+  `/sys/class/rc/rc*` device with the current upstream kernel. The hardware needs
+  PWM input-capture support that is not available in the current PWM DT binding
+  and driver, so the Peripherals IR page is mainly useful for future support or
+  external receivers that provide a supported RC device.
 - The CM5 kernel DTS enables eMMC through `sdhci`, and U-Boot is patched to try
   eMMC before microSD. The generated image is suitable for flashing to either
   microSD or eMMC; remove the microSD card after flashing eMMC if you want the

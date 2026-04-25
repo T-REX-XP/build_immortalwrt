@@ -123,7 +123,7 @@ list:
 - The generated config sets `CONFIG_TARGET_ROOTFS_PARTSIZE=512` by default so
   the Docker-enabled CM5 image has enough ext4 rootfs space. Override it with
   `IMMORTALWRT_ROOTFS_PARTSIZE` if you need a different size in MiB.
-- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky luci-app-blocky luci-app-security-guide luci-app-peripherals transmission-daemon luci-app-transmission docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg"` if you want
+- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky luci-app-blocky luci-app-security-guide luci-app-peripherals luci-app-buttons speedtest-go luci-app-speedtest transmission-daemon luci-app-transmission docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg"` if you want
   the build to fail when those packages are missing from the final manifest.
 
 ## Image Assumptions
@@ -144,11 +144,24 @@ list:
   same HTTP/API listener so `luci-app-blocky` can show overview counters without
   requiring a separate metrics service.
 - The image includes `luci-app-security-guide`, a static LuCI page under
-  `Network -> Security Guide` with external links for DNS leak, IP, WebRTC,
-  ad-block, IPv6, TLS, and firewall exposure checks.
+  `Network -> Security Guide` and `Status -> Security Guide` with external
+  links for DNS leak, IP, WebRTC, ad-block, IPv6, TLS, and firewall exposure
+  checks.
 - The image includes `luci-app-peripherals` under `System -> Peripherals` for
   button script editing, infrared receiver/keymap management, PWM fan control,
   and module diagnostics.
+- The image also includes `luci-app-buttons` under `System -> Buttons` for a
+  focused button-management page similar in placement to the standard LED
+  configuration page. It edits hotplug scripts under `/etc/rc.button/`.
+- The image includes `speedtest-go` and `luci-app-speedtest`. LuCI exposes it
+  under `Network -> Speed Test` and `Status -> Speed Test`, running the router
+  side speed test client and showing its raw output.
+- The Orange Pi CM5 Base has onboard IR hardware, but the current upstream
+  kernel cannot expose it as `/sys/class/rc/rc*` yet because the receiver needs
+  PWM input-capture support that is not available in the current PWM DT binding
+  and driver. The Peripherals IR page keeps keymap editing available for future
+  support or external receivers, but no RC device is expected for the onboard IR
+  receiver in this image.
 - The kernel DTS enables the CM5 eMMC controller (`sdhci`) and the U-Boot build
   is patched to try eMMC before microSD. The same generated image can be written
   to either a microSD card or the CM5 eMMC; remove the microSD card after
