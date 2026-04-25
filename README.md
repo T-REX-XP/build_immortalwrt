@@ -99,7 +99,8 @@ list:
 - `scripts/build-immortalwrt-macos.sh`: host entry point.
 - `scripts/Dockerfile`: Ubuntu build environment for Docker Desktop.
 - `scripts/build-inner.sh`: container-side build workflow.
-- `scripts/feeds.conf.cm5`: minimal package + LuCI feeds for the CM5 build.
+- `scripts/feeds.conf.cm5`: minimal package + LuCI feeds for the CM5 build,
+  including the optional third-party `fantastic-packages` feed.
 - `scripts/verify-kernel-modules.sh`: checks that the built kernel and staged
   module directory use the same version.
 - `docs/BUILDING_MACOS.md`: extra usage notes and debugging commands.
@@ -111,7 +112,8 @@ list:
 - The download cache is mounted at `/dl` and linked as `dl/` inside the copied
   tree, so repeated builds reuse source tarballs.
 - `scripts/feeds.conf.cm5` includes the extra `awgopenwrt` feed for AmneziaWG
-  packages in addition to ImmortalWrt `packages` and `luci`.
+  packages and the third-party `fantastic-packages` feed in addition to
+  ImmortalWrt `packages` and `luci`.
 - The default `/work` Docker volume is much faster than rebuilding from a fresh
   container because OpenWrt's `build_dir`, `staging_dir`, `tmp`, and feeds clones
   survive between runs.
@@ -123,7 +125,7 @@ list:
 - The generated config sets `CONFIG_TARGET_ROOTFS_PARTSIZE=512` by default so
   the Docker-enabled CM5 image has enough ext4 rootfs space. Override it with
   `IMMORTALWRT_ROOTFS_PARTSIZE` if you need a different size in MiB.
-- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky luci-app-blocky luci-app-security-guide luci-app-peripherals luci-app-buttons speedtest-go luci-app-speedtest transmission-daemon luci-app-transmission docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg"` if you want
+- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky luci-app-blocky luci-app-security-guide luci-app-peripherals luci-app-buttons speedtest-go luci-app-speedtest fantastic-keyring fantastic-packages-feeds transmission-daemon luci-app-transmission docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg"` if you want
   the build to fail when those packages are missing from the final manifest.
 
 ## Image Assumptions
@@ -158,6 +160,10 @@ list:
 - The image includes `speedtest-go` and `luci-app-speedtest`. LuCI exposes it
   under `Network -> Speed Test` and `Status -> Speed Test`, running the router
   side speed test client and showing its raw output.
+- The image includes `fantastic-keyring` and `fantastic-packages-feeds` so the
+  flashed router can use the third-party `fantastic-packages` repository after
+  boot. This feed is external to ImmortalWrt and should be treated as a trusted
+  third-party source only when you intentionally install packages from it.
 - The Orange Pi CM5 Base has onboard IR hardware, but the current upstream
   kernel cannot expose it as `/sys/class/rc/rc*` yet because the receiver needs
   PWM input-capture support that is not available in the current PWM DT binding
