@@ -224,10 +224,39 @@ Watch hotplug events while pressing the physical button:
 logread -f
 ```
 
+The default CM5 `wps` script logs a message when it runs. If your current image
+has an older script without logging, add a temporary diagnostic script:
+
+```sh
+cp /etc/rc.button/wps /etc/rc.button/wps.bak
+cat > /etc/rc.button/wps <<'EOF'
+#!/bin/sh
+logger -t button-test "ACTION=$ACTION BUTTON=$BUTTON SEEN=$SEEN"
+return 0
+EOF
+chmod 0755 /etc/rc.button/wps
+```
+
+Then run `logread -f` and press `USERKEY`. Restore the original script after
+testing:
+
+```sh
+mv /etc/rc.button/wps.bak /etc/rc.button/wps
+chmod 0755 /etc/rc.button/wps
+```
+
 In another SSH session, you can also monitor input devices:
 
 ```sh
 cat /proc/bus/input/devices
+```
+
+Check whether the kernel input device and hotplug module are present:
+
+```sh
+lsmod | grep -E 'gpio_keys|gpio_button_hotplug'
+cat /proc/bus/input/devices
+dmesg | grep -Ei 'gpio-keys|gpio_button|input'
 ```
 
 The Orange Pi CM5 Base `USERKEY` is expected to map to `KEY_WPS_BUTTON`, which
