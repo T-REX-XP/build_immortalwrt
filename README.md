@@ -146,30 +146,30 @@ list:
   same HTTP/API listener so `luci-app-blocky` can show overview counters without
   requiring a separate metrics service.
 - The image includes `luci-app-security-guide`, a static LuCI page under
-  `Network -> Security Guide` and `Status -> Security Guide` with external
-  links for DNS leak, IP, WebRTC, ad-block, IPv6, TLS, and firewall exposure
-  checks.
+  `Network -> Security Guide` with external links for DNS leak, IP, WebRTC,
+  ad-block, IPv6, TLS, and firewall exposure checks.
 - The image includes `luci-app-peripherals` under `System -> Peripherals` for
-  button script editing, infrared receiver/keymap management, PWM fan control,
-  and module diagnostics.
+  infrared receiver/keymap management, PWM fan control, and module diagnostics.
+  Button state is still included in its debug report, but button editing is
+  intentionally handled by the dedicated Buttons app.
 - The image also includes `luci-app-buttons` under `System -> Buttons` for a
   focused button-management page similar in placement to the standard LED
   configuration page. It edits hotplug scripts under `/etc/rc.button/`.
 - See `docs/FAN_BUTTON_DIAGNOSTICS.md` for the SSH and LuCI checks used to
   validate PWM fan control and physical button hotplug handling.
 - The image includes `speedtest-go` and `luci-app-speedtest`. LuCI exposes it
-  under `Network -> Speed Test` and `Status -> Speed Test`, running the router
-  side speed test client and showing its raw output.
+  under `Network -> Speed Test`, running the router side speed test client and
+  showing its raw output.
 - The image includes `fantastic-keyring` and `fantastic-packages-feeds` so the
   flashed router can use the third-party `fantastic-packages` repository after
   boot. This feed is external to ImmortalWrt and should be treated as a trusted
   third-party source only when you intentionally install packages from it.
-- The Orange Pi CM5 Base has onboard IR hardware, but the current upstream
-  kernel cannot expose it as `/sys/class/rc/rc*` yet because the receiver needs
-  PWM input-capture support that is not available in the current PWM DT binding
-  and driver. The Peripherals IR page keeps keymap editing available for future
-  support or external receivers, but no RC device is expected for the onboard IR
-  receiver in this image.
+- The Orange Pi CM5 Base has onboard IR hardware wired through PWM input
+  capture. The Peripherals IR page treats this as the default onboard
+  implementation, shows PWM/counter diagnostics when the kernel exposes them,
+  and keeps RC keymap editing for external receivers that create
+  `/sys/class/rc/rc*` devices. A comment-only `/etc/rc_maps.cfg` is created on
+  first boot if the image does not already provide one.
 - The kernel DTS enables the CM5 eMMC controller (`sdhci`) and the U-Boot build
   is patched to try eMMC before microSD. The same generated image can be written
   to either a microSD card or the CM5 eMMC; remove the microSD card after

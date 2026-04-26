@@ -67,27 +67,27 @@ IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale clo
   separately, such as forwarding `dnsmasq` to `127.0.0.1#5353`.
 - Prometheus metrics are enabled at `/metrics` on the same HTTP/API listener so
   the LuCI Blocky dashboard can show overview counters after first boot.
-- `luci-app-security-guide` provides static `Network -> Security Guide` and
-  `Status -> Security Guide` pages with external links for DNS leak, IP,
-  browser leak, ad-block, IPv6, TLS, and firewall exposure checks.
-- `luci-app-peripherals` provides the `System -> Peripherals` UI for button
-  scripts, infrared receiver/keymap management, PWM fan control, and module
-  diagnostics.
+- `luci-app-security-guide` provides a static `Network -> Security Guide` page
+  with external links for DNS leak, IP, browser leak, ad-block, IPv6, TLS, and
+  firewall exposure checks.
+- `luci-app-peripherals` provides the `System -> Peripherals` UI for infrared
+  receiver/keymap management, PWM fan control, and module diagnostics. Its
+  debug report still includes button state for troubleshooting.
 - `luci-app-buttons` provides a focused `System -> Buttons` UI for managing
   hotplug scripts under `/etc/rc.button/`, similar in placement to the standard
   LED configuration page.
 - `docs/FAN_BUTTON_DIAGNOSTICS.md` contains the manual SSH and LuCI validation
   steps for PWM fan control and button hotplug support.
 - `speedtest-go` and `luci-app-speedtest` provide router-side internet speed
-  testing from `Network -> Speed Test` and `Status -> Speed Test`.
+  testing from `Network -> Speed Test`.
 - `fantastic-keyring` and `fantastic-packages-feeds` configure access to the
   third-party `fantastic-packages` repository for optional package installs
   after boot.
-- The onboard CM5 Base IR receiver is not expected to create a
-  `/sys/class/rc/rc*` device with the current upstream kernel. The hardware needs
-  PWM input-capture support that is not available in the current PWM DT binding
-  and driver, so the Peripherals IR page is mainly useful for future support or
-  external receivers that provide a supported RC device.
+- The onboard CM5 Base IR receiver is wired through PWM input capture, not a
+  normal GPIO RC receiver. The Peripherals IR page shows this as the default
+  onboard implementation, reports PWM/counter capture diagnostics when
+  available, and keeps `/etc/rc_maps.cfg` editing for external receivers that
+  provide a supported `/sys/class/rc/rc*` device.
 - The CM5 kernel DTS enables eMMC through `sdhci`, and U-Boot is patched to try
   eMMC before microSD. The generated image is suitable for flashing to either
   microSD or eMMC; remove the microSD card after flashing eMMC if you want the

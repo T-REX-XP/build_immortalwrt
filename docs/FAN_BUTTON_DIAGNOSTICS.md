@@ -15,8 +15,8 @@ Open LuCI at `https://192.168.8.1/`.
 
 - `System -> Peripherals -> PWM fan` should show current fan readings when the
   `pwmfan` hwmon device is present.
-- `System -> Peripherals -> Buttons` shows detected `/etc/rc.button/` scripts
-  and module diagnostics.
+- `System -> Peripherals -> Diagnostics` can collect a read-only debug report
+  that includes button, module, device tree, fan, IR, and log state.
 - `System -> Buttons` provides a focused editor for hotplug button scripts.
 
 If a page reports that no device or script was found, continue with the SSH
@@ -102,8 +102,8 @@ Manual fan test:
 
 ```sh
 cd /sys/class/hwmon/hwmonX
-echo 1 > pwm1_enable
 echo 255 > pwm1
+echo 2 > pwm1_enable
 sleep 5
 echo 128 > pwm1
 sleep 5
@@ -118,8 +118,8 @@ polarity:
 
 ```sh
 cd /sys/class/hwmon/hwmonX
-echo 1 > pwm1_enable
 echo 0 > pwm1
+echo 2 > pwm1_enable
 sleep 5
 echo 255 > pwm1
 sleep 5
@@ -129,6 +129,9 @@ echo 128 > pwm1
 If `0` turns the fan on and `255` turns it off, the hardware control line is
 inverted and the DTS `pwms` polarity must be changed to
 `PWM_POLARITY_INVERTED`.
+
+In LuCI, these checks are available as `Full-speed test`, `Inverted full-speed
+test`, and `Stop fan` under `System -> Peripherals -> Cooling fan`.
 
 If neither `0` nor `255` turns the fan on, check the physical layer before
 changing software:
@@ -275,6 +278,40 @@ Expected return code:
 0
 ```
 
+## Infrared Checklist
+
+The Orange Pi CM5 Base has an onboard IR receiver, but it is wired through PWM
+input capture rather than a normal GPIO RC input. With the current upstream
+RK3588 kernel binding, the onboard receiver is not expected to create
+`/sys/class/rc/rc*`.
+
+In LuCI, use `System -> Peripherals -> Infrared`:
+
+- `Onboard IR receiver` should describe the PWM input-capture implementation.
+- `PWM/counter capture diagnostics` will show Linux counter devices if a future
+  kernel and DTB expose the raw capture block.
+- `External RC devices` lists `/sys/class/rc/rc*` devices from separate
+  supported receivers.
+
+Over SSH, collect the same state:
+
+```sh
+ls -la /sys/class/rc 2>/dev/null || true
+ls -la /sys/bus/counter/devices 2>/dev/null || true
+ir-keytable 2>&1 || true
+cat /etc/rc_maps.cfg
+dmesg | grep -Ei 'ir|rc-core|pwm|counter' | tail -n 100
+```
+
+Expected onboard-only result on current images:
+
+```text
+No /sys/class/rc/rc* device for the onboard receiver.
+```
+
+That is not a failure by itself. It only becomes a failure if you attach an
+external supported IR receiver and still do not get an `rc*` device.
+
 ## Common Failure Meanings
 
 `No pwmfan device was found`
@@ -291,6 +328,13 @@ Button press does nothing
 
 Check `gpio_button_hotplug`, `gpio_keys`, the device tree key code, and whether
 the script matching the button name exists under `/etc/rc.button/`.
+
+`No external RC devices were found`
+
+This is expected for the onboard CM5 Base IR receiver on current images. The
+onboard receiver uses PWM input capture and is reported separately in the
+Peripherals IR diagnostics. Check this only as an error for an attached external
+IR receiver or overlay that should create `/sys/class/rc/rc*`.
 
 LuCI page exists but RPC calls fail
 
