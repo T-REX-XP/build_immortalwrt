@@ -30,6 +30,10 @@ The CM5 Base fan support needs three layers to line up:
 - Kernel package `kmod-hwmon-pwmfan` is installed and `pwm_fan` is loaded.
 - A hwmon entry named `pwmfan` appears under `/sys/class/hwmon/`.
 
+For Orange Pi CM5 Base, the fan node should use the vendor Linux mapping
+`PWM13` with `pwm13m1_pins` and a `20000000` ns period. Older local images used
+`PWM3`, which can expose a `pwmfan` hwmon device while driving the wrong output.
+
 Check the installed packages:
 
 ```sh
