@@ -23,6 +23,22 @@ RESET_WORK_CACHE=0
 RESET_CCACHE=0
 BUILD_IMAGE=1
 DOCKER_BUILD_ARGS=()
+CUSTOM_FEED_HOST=""
+#
+# Apple Silicon + Docker Desktop: amd64 containers use Rosetta / QEMU for x86-64 Linux,
+# which often breaks during feeds/Make with:
+#   rosetta error: failed to open elf at /lib64/ld-linux-x86-64.so.2
+# Default to linux/arm64 here unless IMMORTALWRT_DOCKER_PLATFORM is already set.
+DOCKER_PLATFORM_ARGS=()
+if [[ "$(uname -s)" == Darwin && "$(uname -m)" == arm64 ]]; then
+	if [[ -z "${IMMORTALWRT_DOCKER_PLATFORM+x}" ]]; then
+		export IMMORTALWRT_DOCKER_PLATFORM=linux/arm64
+	fi
+fi
+if [[ -n "${IMMORTALWRT_DOCKER_PLATFORM:-}" ]]; then
+	DOCKER_PLATFORM_ARGS=(--platform "$IMMORTALWRT_DOCKER_PLATFORM")
+	echo "Docker platform: $IMMORTALWRT_DOCKER_PLATFORM (empty IMMORTALWRT_DOCKER_PLATFORM before launch for Docker default; use linux/amd64 only if required)."
+fi
 
 usage() {
 	cat <<'USAGE'
@@ -50,7 +66,11 @@ Options:
   --no-build-image      Reuse an existing builder image.
   --docker-build-arg X  Extra argument passed to docker build.
   --allow-feed-failure  Continue if feeds update fails (needs warmed Docker work volume).
+  --custom-feed DIR     Host path to openwrt-packages/feeds (mounted at /custom-feed in container).
   -h, --help            Show this help.
+
+Docker / Apple Silicon:
+  IMMORTALWRT_DOCKER_PLATFORM defaults to linux/arm64 on Darwin/arm64 (avoid Rosetta on amd64 images).
 
 Useful environment variables passed through to the container:
   IMMORTALWRT_MAKE_JOBS
@@ -67,6 +87,8 @@ Useful environment variables passed through to the container:
   IMMORTALWRT_PRUNE_BROKEN_FEED_PACKAGES
   IMMORTALWRT_SKIP_FEEDS_UPDATE
   IMMORTALWRT_FEEDS_UPDATE_ALLOW_FAILURE
+  IMMORTALWRT_SKIP_DOWNLOAD
+  IMMORTALWRT_CUSTOM_FEED            (normally set by --custom-feed; container path /custom-feed)
 USAGE
 }
 
@@ -144,6 +166,10 @@ while [[ $# -gt 0 ]]; do
 			IMMORTALWRT_FEEDS_UPDATE_ALLOW_FAILURE=1
 			shift
 			;;
+		--custom-feed)
+			CUSTOM_FEED_HOST="${2:-}"
+			shift 2
+			;;
 		-h|--help)
 			usage
 			exit 0
@@ -168,6 +194,14 @@ if [[ ! -d "$SOURCE/scripts" || ! -f "$SOURCE/rules.mk" ]]; then
 	exit 1
 fi
 
+if [[ -n "$CUSTOM_FEED_HOST" ]]; then
+	CUSTOM_FEED_HOST="$(cd "$CUSTOM_FEED_HOST" && pwd)"
+	if [[ ! -d "$CUSTOM_FEED_HOST/packages" || ! -d "$CUSTOM_FEED_HOST/luci" ]]; then
+		echo "--custom-feed must be the feeds root with packages/ and luci/ (e.g. …/openwrt-packages/feeds)." >&2
+		exit 1
+	fi
+fi
+
 if [[ -n "$FEEDS_CONF" ]]; then
 	FEEDS_CONF="$(cd "$(dirname "$FEEDS_CONF")" && pwd)/$(basename "$FEEDS_CONF")"
 	if [[ ! -f "$FEEDS_CONF" ]]; then
@@ -189,6 +223,9 @@ fi
 
 if [[ "$BUILD_IMAGE" == "1" ]]; then
 	docker_build_cmd=(docker build)
+	if [[ ${#DOCKER_PLATFORM_ARGS[@]} -gt 0 ]]; then
+		docker_build_cmd+=("${DOCKER_PLATFORM_ARGS[@]}")
+	fi
 	if [[ ${#DOCKER_BUILD_ARGS[@]} -gt 0 ]]; then
 		docker_build_cmd+=("${DOCKER_BUILD_ARGS[@]}")
 	fi
@@ -234,6 +271,10 @@ if [[ -n "$FEEDS_CONF" ]]; then
 	docker_args+=(-v "$FEEDS_CONF:/feeds.conf.custom:ro" -e "IMMORTALWRT_FEEDS_CONF=/feeds.conf.custom")
 fi
 
+if [[ -n "$CUSTOM_FEED_HOST" ]]; then
+	docker_args+=(-v "$CUSTOM_FEED_HOST:/custom-feed:ro" -e "IMMORTALWRT_CUSTOM_FEED=/custom-feed")
+fi
+
 for var in \
 	IMMORTALWRT_MAKE_JOBS \
 	IMMORTALWRT_STOP_AFTER_CONFIG \
@@ -267,5 +308,8 @@ if [[ "$USE_CCACHE" == "1" ]]; then
 else
 	echo "Compiler cache volume: disabled"
 fi
+if [[ -n "$CUSTOM_FEED_HOST" ]]; then
+	echo "Custom feed (openwrt_packages): $CUSTOM_FEED_HOST -> /custom-feed"
+fi
 
-exec docker run "${docker_args[@]}" "$IMAGE" /bin/bash /scripts/build-inner.sh
+exec docker run "${DOCKER_PLATFORM_ARGS[@]}" "${docker_args[@]}" "$IMAGE" /bin/bash /scripts/build-inner.sh

@@ -122,6 +122,13 @@ list:
 - The builder image includes `/usr/local/go` and the generated OpenWrt config
   points `CONFIG_GOLANG_EXTERNAL_BOOTSTRAP_ROOT` at it. This avoids building
   `golang-bootstrap`, which is not supported on Linux arm64 Docker hosts.
+- On Apple Silicon hosts (`Darwin/arm64`), `build-immortalwrt-macos.sh` defaults to
+  `docker … --platform linux/arm64` for both image build and the compile container,
+  so feeds/Make run native aarch64 Ubuntu binaries instead of amd64 under Rosetta
+  (which can fail with `rosetta error: failed to open elf at /lib64/ld-linux-x86-64.so.2`).
+  Set `IMMORTALWRT_DOCKER_PLATFORM=linux/amd64` before the script only if you intend
+  to use emulated amd64. After switching platform, run once with `--reset-work-cache`
+  so `staging_dir` matches.
 - The generated config sets `CONFIG_TARGET_ROOTFS_PARTSIZE=512` by default so
   the Docker-enabled CM5 image has enough ext4 rootfs space. Override it with
   `IMMORTALWRT_ROOTFS_PARTSIZE` if you need a different size in MiB.

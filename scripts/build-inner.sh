@@ -70,6 +70,14 @@ if [[ "$USE_CCACHE" == "1" ]]; then
 	echo "Using ccache: $CCACHE_DIR ($(ccache -s | sed -n '1p'))"
 fi
 
+echo "=== Host prerequisites for feeds (staging_dir/host/bin) ==="
+JOBS_PREP="${IMMORTALWRT_PREP_MAKE_JOBS:-$(nproc)}"
+make -j"$JOBS_PREP" prepare-mk OPENWRT_BUILD=
+[[ -x staging_dir/host/bin/mkhash ]] || {
+	echo "ERROR: staging_dir/host/bin/mkhash missing after prepare-mk." >&2
+	exit 1
+}
+
 echo "=== Preparing feeds ==="
 if [[ -n "${IMMORTALWRT_FEEDS_CONF:-}" && -f "${IMMORTALWRT_FEEDS_CONF}" ]]; then
 	cp "$IMMORTALWRT_FEEDS_CONF" feeds.conf
@@ -77,6 +85,15 @@ if [[ -n "${IMMORTALWRT_FEEDS_CONF:-}" && -f "${IMMORTALWRT_FEEDS_CONF}" ]]; the
 else
 	[[ -f feeds.conf ]] || cp feeds.conf.default feeds.conf
 	echo "Using feeds.conf from source tree/default."
+fi
+
+if [[ -n "${IMMORTALWRT_CUSTOM_FEED:-}" ]]; then
+	if [[ ! -d "${IMMORTALWRT_CUSTOM_FEED}/packages" || ! -d "${IMMORTALWRT_CUSTOM_FEED}/luci" ]]; then
+		echo "ERROR: IMMORTALWRT_CUSTOM_FEED must point at a directory containing packages/ and luci/ (openwrt-packages/feeds)." >&2
+		exit 1
+	fi
+	echo "src-link openwrt_packages ${IMMORTALWRT_CUSTOM_FEED}" >> feeds.conf
+	echo "Custom feed openwrt_packages -> ${IMMORTALWRT_CUSTOM_FEED}"
 fi
 
 if [[ -d feeds/packages/.git ]]; then
