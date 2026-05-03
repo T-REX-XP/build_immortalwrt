@@ -128,20 +128,52 @@ list:
 - Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky luci-app-blocky luci-app-security-guide luci-app-peripherals luci-app-buttons speedtest-go luci-app-speedtest fantastic-keyring fantastic-packages-feeds transmission-daemon luci-app-transmission docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg"` if you want
   the build to fail when those packages are missing from the final manifest.
 
-## Image Assumptions
+## Blocky DNS and Wi-Fi client DNS
+
+- The `blocky` package installs `/etc/blocky/config.yml` into the image. The
+  first-boot script at `/etc/uci-defaults/90-blocky-enable` only enables and
+  starts Blocky when `/etc/init.d/blocky` exists and that config file is
+  non-empty.
+- By default Blocky listens for DNS on port **5353** and HTTP/API (including
+  Prometheus metrics) on port **4000**. That avoids fighting `dnsmasq` for port
+  **53**, which dnsmasq keeps for DHCP clients on LAN/Wi-Fi.
+- **LuCI (`Services → Blocky DNS → Configuration`):** use **Router DNS
+  integration** to set `dnsmasq` upstream to Blocky (`127.0.0.1#port`). That
+  makes filtering and block lists apply to every DHCP client without changing
+  DNS on each phone or laptop. Fresh installs run `/etc/uci-defaults/90-blocky-enable`
+  once so Blocky starts enabled **and** `dnsmasq` forwarding is applied automatically.
+  The CLI helper `/usr/sbin/blocky-dnsmasq-sync` performs the same `uci` changes.
+  Disabling forwarding removes that upstream entry so dnsmasq falls back to normal
+  WAN/resolv behaviour.
+- Use **Controls → Refresh lists** (Blocky HTTP API) after editing blocklists in
+  YAML so Blocky reloads remote lists without a full reboot.
+- **Block lists / upstreams:** edit `config.yml` (upstream resolvers, denylist
+  URLs, groups). Save in LuCI and restart Blocky.
+
+### If Wi-Fi clients get no DNS but IP ping works
+
+Symptoms match yours when **hostname resolution** fails but **routing works**
+(e.g. `ping 8.8.8.8` OK, `ping example.com` does not).
+
+1. **Dnsmasq → Blocky:** If you enabled Router DNS integration but Blocky is
+   stopped or stuck, dnsmasq cannot resolve. Check **Services → Blocky DNS** (or
+   `service blocky running`) and LuCI **Status → Processes**.
+2. **WAN DNS:** If `dnsmasq` has no usable upstream (WAN DHCP without DNS,
+   broken PPP DNS, etc.), nothing resolves. On the router try:
+   `nslookup example.com 127.0.0.1` (hits dnsmasq on port 53). Compare with
+   `cat /tmp/resolv.conf.d/resolv.conf.auto`.
+3. **AP / dumb-AP setups:** Clients must receive a DNS server (usually the AP’s
+   LAN IP). If the AP does not run DHCP/DNS or forwards DHCP without option 6,
+   clients may have no resolver.
+
+Reference: [OpenWrt dnsmasq DNS docs](https://openwrt.org/docs/guide-user/base-system/dhcp.dns).
+
+## Other image assumptions
 
 - The CM5 image includes `luci-ssl`, so LuCI and `uhttpd` are expected to be
   available after first boot.
 - The default LAN address is `192.168.8.1`; DHCP clients on LAN should receive
   `192.168.8.x` addresses from the normal OpenWrt LAN DHCP pool.
-- The `blocky` package installs `/etc/blocky/config.yml` into the image. The
-  first-boot script at `/etc/uci-defaults/90-blocky-enable` only enables and
-  starts Blocky when `/etc/init.d/blocky` exists and that config file is
-  non-empty.
-- The default Blocky config listens for DNS on port `5353` and HTTP/API on port
-  `4000`. This avoids a DNS port conflict with `dnsmasq`, but LAN clients will
-  not automatically use Blocky unless DNS forwarding is configured separately,
-  for example by forwarding `dnsmasq` to `127.0.0.1#5353`.
 - The default Blocky config enables Prometheus metrics at `/metrics` on the
   same HTTP/API listener so `luci-app-blocky` can show overview counters without
   requiring a separate metrics service.

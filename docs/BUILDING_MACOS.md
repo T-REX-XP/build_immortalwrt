@@ -57,14 +57,12 @@ IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale clo
   expose LuCI through the standard OpenWrt web server after first boot.
 - The LAN interface uses `192.168.8.1`; DHCP clients should receive
   `192.168.8.x` addresses from the normal LAN pool.
-- `blocky` installs `/etc/blocky/config.yml` at image build time. The first boot
-  script `/etc/uci-defaults/90-blocky-enable` only enables and starts the
-  service when `/etc/init.d/blocky` is executable and the config file is
-  present and non-empty.
-- Blocky listens on DNS port `5353` by default, while its HTTP/API endpoint uses
-  port `4000`. This lets Blocky start without fighting `dnsmasq` for port `53`;
-  clients will only use Blocky automatically if DNS forwarding is configured
-  separately, such as forwarding `dnsmasq` to `127.0.0.1#5353`.
+- `blocky` installs `/etc/blocky/config.yml` at image build time. On **first boot
+  only**, `/etc/uci-defaults/90-blocky-enable` enables and starts Blocky when
+  `/etc/init.d/blocky` exists and the YAML is non-empty, then applies **`dnsmasq`
+  → Blocky** (`blocky-dnsmasq-sync enable`) so DHCP clients use filtering without extra setup.
+- Blocky listens on DNS port `5353` by default; HTTP/API (and Prometheus metrics)
+  use port `4000`. After first boot you can change forwarding via LuCI **Services → Blocky DNS → Configuration → Router DNS integration** or `/usr/sbin/blocky-dnsmasq-sync`. See the repo **README.md** Blocky section for troubleshooting (“IP ping works, DNS does not”).
 - Prometheus metrics are enabled at `/metrics` on the same HTTP/API listener so
   the LuCI Blocky dashboard can show overview counters after first boot.
 - `luci-app-security-guide` provides a static `Network -> Security Guide` page
