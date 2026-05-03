@@ -49,6 +49,7 @@ Options:
   --image NAME          Docker builder image tag.
   --no-build-image      Reuse an existing builder image.
   --docker-build-arg X  Extra argument passed to docker build.
+  --allow-feed-failure  Continue if feeds update fails (needs warmed Docker work volume).
   -h, --help            Show this help.
 
 Useful environment variables passed through to the container:
@@ -64,6 +65,8 @@ Useful environment variables passed through to the container:
   IMMORTALWRT_CCACHE_VOLUME
   IMMORTALWRT_PATCH_PYTHON3_EMAIL_KCONFIG
   IMMORTALWRT_PRUNE_BROKEN_FEED_PACKAGES
+  IMMORTALWRT_SKIP_FEEDS_UPDATE
+  IMMORTALWRT_FEEDS_UPDATE_ALLOW_FAILURE
 USAGE
 }
 
@@ -136,6 +139,10 @@ while [[ $# -gt 0 ]]; do
 		--docker-build-arg)
 			DOCKER_BUILD_ARGS+=("$2")
 			shift 2
+			;;
+		--allow-feed-failure)
+			IMMORTALWRT_FEEDS_UPDATE_ALLOW_FAILURE=1
+			shift
 			;;
 		-h|--help)
 			usage
@@ -236,7 +243,9 @@ for var in \
 	IMMORTALWRT_ROOTFS_PARTSIZE \
 	IMMORTALWRT_CACHE_FEEDS \
 	IMMORTALWRT_PATCH_PYTHON3_EMAIL_KCONFIG \
-	IMMORTALWRT_PRUNE_BROKEN_FEED_PACKAGES
+	IMMORTALWRT_PRUNE_BROKEN_FEED_PACKAGES \
+	IMMORTALWRT_SKIP_FEEDS_UPDATE \
+	IMMORTALWRT_FEEDS_UPDATE_ALLOW_FAILURE
 do
 	if [[ -n "${!var:-}" ]]; then
 		docker_args+=(-e "$var=${!var}")

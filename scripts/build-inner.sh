@@ -83,7 +83,17 @@ if [[ -d feeds/packages/.git ]]; then
 	git -C feeds/packages checkout -- lang/python/python3/files/python3-package-email.mk 2>/dev/null || true
 fi
 
-./scripts/feeds update -a
+if [[ "${IMMORTALWRT_SKIP_FEEDS_UPDATE:-0}" == "1" ]]; then
+	echo "Skipping ./scripts/feeds update -a (IMMORTALWRT_SKIP_FEEDS_UPDATE=1)."
+elif ./scripts/feeds update -a; then
+	:
+elif [[ "${IMMORTALWRT_FEEDS_UPDATE_ALLOW_FAILURE:-0}" == "1" ]]; then
+	echo "WARNING: ./scripts/feeds update -a failed (network/DNS/offline?). Continuing with existing feeds/ checkouts." >&2
+	echo "WARNING: Requires a warmed Docker work volume; cold/offline builds may fail later at feeds install." >&2
+else
+	echo "ERROR: ./scripts/feeds update -a failed. Fix GitHub access or pass IMMORTALWRT_FEEDS_UPDATE_ALLOW_FAILURE=1 / --allow-feed-failure when using cached feeds." >&2
+	exit 1
+fi
 
 if [[ "${IMMORTALWRT_PATCH_PYTHON3_EMAIL_KCONFIG:-1}" == "1" ]]; then
 	for f in \
@@ -125,7 +135,12 @@ if [[ "${IMMORTALWRT_PRUNE_BROKEN_FEED_PACKAGES:-0}" == "1" ]]; then
 			echo "Pruned packages feed: feeds/packages/$d"
 		fi
 	done
-	./scripts/feeds update -i packages
+	if ! ./scripts/feeds update -i packages; then
+		if [[ "${IMMORTALWRT_FEEDS_UPDATE_ALLOW_FAILURE:-0}" != "1" ]]; then
+			exit 1
+		fi
+		echo "WARNING: ./scripts/feeds update -i packages failed; continuing." >&2
+	fi
 fi
 
 rm -rf package/feeds
