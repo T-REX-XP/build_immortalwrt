@@ -188,7 +188,12 @@ fi
 JOBS="${IMMORTALWRT_MAKE_JOBS:-$(nproc)}"
 
 echo "=== Downloading sources ==="
-make -j"$JOBS" download 2>/dev/null || true
+if [[ "${IMMORTALWRT_SKIP_DOWNLOAD:-0}" == "1" ]]; then
+	echo "Skipping make download (IMMORTALWRT_SKIP_DOWNLOAD=1)."
+elif ! make -j"$JOBS" download; then
+	echo "ERROR: make download failed (network, mirror, or disk). Fix and retry; do not ignore this step." >&2
+	exit 1
+fi
 
 if [[ "${IMMORTALWRT_SKIP_TARGET_BIN_CLEAN:-0}" != "1" ]]; then
 	rm -rf "$TARGET_DIR"
