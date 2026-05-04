@@ -4,4 +4,4 @@ src-git packages https://github.com/immortalwrt/packages.git
 src-git luci https://github.com/immortalwrt/luci.git
 src-git awgopenwrt https://github.com/this-username-has-been-taken/amneziawg-openwrt.git
 src-git --root=feeds fantastic_packages https://github.com/fantastic-packages/packages.git;master
-# Custom packages feed (blocky, peripherals, …): use build-immortalwrt-macos.sh --custom-feed …/openwrt-packages/feeds (appends src-link openwrt_packages).
+# Custom packages feed (blocky, peripherals, …): build-immortalwrt-macos.sh auto-mounts sibling …/openwrt-packages/feeds when present; or pass --custom-feed PATH (appends src-link openwrt_packages).

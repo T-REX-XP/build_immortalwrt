@@ -67,6 +67,7 @@ Options:
   --docker-build-arg X  Extra argument passed to docker build.
   --allow-feed-failure  Continue if feeds update fails (needs warmed Docker work volume).
   --custom-feed DIR     Host path to openwrt-packages/feeds (mounted at /custom-feed in container).
+                        If omitted, a sibling DIR/openwrt-packages/feeds next to immortalwrt is used when present.
   -h, --help            Show this help.
 
 Docker / Apple Silicon:
@@ -88,7 +89,7 @@ Useful environment variables passed through to the container:
   IMMORTALWRT_SKIP_FEEDS_UPDATE
   IMMORTALWRT_FEEDS_UPDATE_ALLOW_FAILURE
   IMMORTALWRT_SKIP_DOWNLOAD
-  IMMORTALWRT_CUSTOM_FEED            (normally set by --custom-feed; container path /custom-feed)
+  IMMORTALWRT_CUSTOM_FEED            (normally auto or set by --custom-feed; container path /custom-feed)
 USAGE
 }
 
@@ -192,6 +193,17 @@ SOURCE="$(cd "$SOURCE" && pwd)"
 if [[ ! -d "$SOURCE/scripts" || ! -f "$SOURCE/rules.mk" ]]; then
 	echo "Expected an ImmortalWrt/OpenWrt source tree at: $SOURCE" >&2
 	exit 1
+fi
+
+# CM5 profile DEVICE_PACKAGES expects blocky + luci-app-blocky from feed openwrt_packages.
+# Without --custom-feed those packages never appear in manifests. If the sibling
+# checkout …/openwrt-packages/feeds exists (layouts like Documents/{immortalwrt,openwrt-packages}), use it.
+if [[ -z "$CUSTOM_FEED_HOST" ]]; then
+	AUTO_CF="$(dirname "$SOURCE")/openwrt-packages/feeds"
+	if [[ -d "$AUTO_CF/packages" && -d "$AUTO_CF/luci" ]]; then
+		CUSTOM_FEED_HOST="$(cd "$AUTO_CF" && pwd)"
+		echo "Auto-selected custom feed: $CUSTOM_FEED_HOST"
+	fi
 fi
 
 if [[ -n "$CUSTOM_FEED_HOST" ]]; then
