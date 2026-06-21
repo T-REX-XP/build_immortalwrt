@@ -112,6 +112,14 @@ else
 	exit 1
 fi
 
+if [[ -n "${IMMORTALWRT_CUSTOM_FEED:-}" ]]; then
+	echo "Refreshing openwrt_packages feed index from ${IMMORTALWRT_CUSTOM_FEED}"
+	if ! ./scripts/feeds update -i openwrt_packages; then
+		echo "ERROR: ./scripts/feeds update -i openwrt_packages failed." >&2
+		exit 1
+	fi
+fi
+
 if [[ "${IMMORTALWRT_PATCH_PYTHON3_EMAIL_KCONFIG:-1}" == "1" ]]; then
 	for f in \
 		feeds/packages/lang/python/python3/files/python3-package-email.mk \
@@ -223,6 +231,20 @@ echo "=== Copying artifacts to /out ==="
 mkdir -p /out
 rsync -a bin/ /out/
 cp .config /out/.config."$TARGET"."$SUBTARGET"."$DEVICE"
+
+# CM5 Base button packages (merged into IMMORTALWRT_EXPECT_PACKAGES when unset or partial).
+_cm5_button_expect="cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug"
+if [[ -z "${IMMORTALWRT_EXPECT_PACKAGES:-}" ]]; then
+	IMMORTALWRT_EXPECT_PACKAGES="$_cm5_button_expect"
+else
+	for _pkg in $_cm5_button_expect; do
+		case " ${IMMORTALWRT_EXPECT_PACKAGES} " in
+		*" $_pkg "*) ;;
+		*) IMMORTALWRT_EXPECT_PACKAGES="$IMMORTALWRT_EXPECT_PACKAGES $_pkg" ;;
+		esac
+	done
+fi
+export IMMORTALWRT_EXPECT_PACKAGES
 
 manifest="$(ls "$TARGET_DIR"/*-"$DEVICE".manifest 2>/dev/null | head -1 || true)"
 if [[ -n "$manifest" && -n "${IMMORTALWRT_EXPECT_PACKAGES:-}" ]]; then
