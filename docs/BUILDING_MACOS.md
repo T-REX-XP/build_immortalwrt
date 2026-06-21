@@ -30,9 +30,8 @@ Repeated builds are cached by default:
 - `/work` is a Docker named volume that preserves `build_dir/`, `staging_dir/`,
   `tmp/`, and feeds between runs.
 - `/ccache` is a Docker named volume used by `CONFIG_CCACHE=y`.
-- `scripts/feeds.conf.cm5` adds the third-party `awgopenwrt` feed for
-  AmneziaWG packages and the third-party `fantastic-packages` feed for optional
-  extended packages.
+- `scripts/feeds.conf.cm5` adds the `awgopenwrt` feed for AmneziaWG packages.
+  The third-party `fantastic-packages` feed is optional — see README.md.
 - The Dockerfile uses BuildKit cache mounts for apt metadata and downloaded
   `.deb` files.
 - `/usr/local/go` in the builder image is used as the external Go bootstrap,
@@ -44,7 +43,7 @@ Repeated builds are cached by default:
 ## Recommended CM5 Command
 
 ```sh
-IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky luci-app-blocky luci-app-security-guide luci-app-peripherals luci-app-buttons speedtest-go luci-app-speedtest fantastic-keyring fantastic-packages-feeds transmission-daemon luci-app-transmission docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg" \
+IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared blocky luci-app-blocky luci-app-security-guide luci-app-peripherals luci-app-buttons speedtest-go luci-app-speedtest docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts" \
 ./scripts/build-immortalwrt-macos.sh \
   --source /Users/t-rex-xp/Documents/immortalwrt \
   --device xunlong_orangepi-cm5-base \
@@ -78,9 +77,6 @@ IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale clo
   steps for PWM fan control and button hotplug support.
 - `speedtest-go` and `luci-app-speedtest` provide router-side internet speed
   testing from `Network -> Speed Test`.
-- `fantastic-keyring` and `fantastic-packages-feeds` configure access to the
-  third-party `fantastic-packages` repository for optional package installs
-  after boot.
 - The onboard CM5 Base IR receiver is wired through PWM input capture, not a
   normal GPIO RC receiver. The Peripherals IR page shows this as the default
   onboard implementation, reports PWM/counter capture diagnostics when

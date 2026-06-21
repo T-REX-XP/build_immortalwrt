@@ -99,8 +99,8 @@ list:
 - `scripts/build-immortalwrt-macos.sh`: host entry point.
 - `scripts/Dockerfile`: Ubuntu build environment for Docker Desktop.
 - `scripts/build-inner.sh`: container-side build workflow.
-- `scripts/feeds.conf.cm5`: minimal package + LuCI feeds for the CM5 build,
-  including the optional third-party `fantastic-packages` feed.
+- `scripts/feeds.conf.cm5`: minimal package + LuCI feeds for the CM5 build
+  (ImmortalWrt `packages`, `luci`, AmneziaWG `awgopenwrt`, plus your `openwrt_packages` feed).
 - `scripts/verify-kernel-modules.sh`: checks that the built kernel and staged
   module directory use the same version.
 - `docs/BUILDING_MACOS.md`: extra usage notes and debugging commands.
@@ -111,9 +111,9 @@ list:
   products go to the `--out-dir`.
 - The download cache is mounted at `/dl` and linked as `dl/` inside the copied
   tree, so repeated builds reuse source tarballs.
-- `scripts/feeds.conf.cm5` includes the extra `awgopenwrt` feed for AmneziaWG
-  packages and the third-party `fantastic-packages` feed in addition to
-  ImmortalWrt `packages` and `luci`.
+- `scripts/feeds.conf.cm5` includes the `awgopenwrt` feed for AmneziaWG packages
+  in addition to ImmortalWrt `packages` and `luci`. The third-party
+  `fantastic-packages` feed is **not** enabled by default (see below).
 - The default `/work` Docker volume is much faster than rebuilding from a fresh
   container because OpenWrt's `build_dir`, `staging_dir`, `tmp`, and feeds clones
   survive between runs.
@@ -132,7 +132,7 @@ list:
 - The generated config sets `CONFIG_TARGET_ROOTFS_PARTSIZE=512` by default so
   the Docker-enabled CM5 image has enough ext4 rootfs space. Override it with
   `IMMORTALWRT_ROOTFS_PARTSIZE` if you need a different size in MiB.
-- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared adblock luci-app-adblock blocky luci-app-blocky luci-app-security-guide luci-app-peripherals luci-app-buttons speedtest-go luci-app-speedtest fantastic-keyring fantastic-packages-feeds transmission-daemon luci-app-transmission docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg"` if you want
+- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared blocky luci-app-blocky luci-app-security-guide luci-app-peripherals luci-app-buttons speedtest-go luci-app-speedtest docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts"` if you want
   the build to fail when those packages are missing from the final manifest.
 
 ## Blocky DNS and Wi-Fi client DNS
@@ -175,6 +175,57 @@ Symptoms match yours when **hostname resolution** fails but **routing works**
 
 Reference: [OpenWrt dnsmasq DNS docs](https://openwrt.org/docs/guide-user/base-system/dhcp.dns).
 
+## Optional: fantastic-packages feed
+
+The default CM5 image and `scripts/feeds.conf.cm5` **do not** include the third-party
+[fantastic-packages](https://github.com/fantastic-packages/packages) repository. This
+keeps builds faster and avoids feed-update failures when that upstream repo moves.
+
+### Benefits when you enable it
+
+- **Extra packages and LuCI apps** beyond official ImmortalWrt feeds (network tools,
+  servers, utilities, and community-maintained apps).
+- **Pre-built APK repositories** (`fantastic-packages-feeds`) matched to your OpenWrt
+  branch and architecture, so you can `opkg install` additional software after boot
+  without rebuilding firmware.
+- **Signed feed metadata** via `fantastic-keyring` when you use the official installer
+  packages from ImmortalWrt.
+
+Treat it as a **trusted third-party source** — only enable if you intend to install
+from that project.
+
+### Enable on a running router
+
+```sh
+opkg update
+opkg install fantastic-keyring fantastic-packages-feeds
+opkg update
+```
+
+Then install packages from the new repositories, for example:
+
+```sh
+opkg list | grep -i fantastic
+```
+
+### Enable for firmware builds
+
+1. Add to `scripts/feeds.conf.cm5` (or your custom `feeds.conf`):
+
+   ```text
+   src-git --root=feeds fantastic_packages https://github.com/fantastic-packages/packages.git;master
+   ```
+
+2. Add to `target/linux/rockchip/image/armv8.mk` `DEVICE_PACKAGES` for your profile:
+
+   ```text
+   fantastic-keyring fantastic-packages-feeds
+   ```
+
+3. Rebuild. If the Docker work volume already cached feeds without `fantastic_packages`,
+   run once with `--reset-work-cache` or use `--allow-feed-failure` when upstream
+   git pulls fail.
+
 ## Other image assumptions
 
 - The CM5 image includes `luci-ssl`, so LuCI and `uhttpd` are expected to be
@@ -199,10 +250,6 @@ Reference: [OpenWrt dnsmasq DNS docs](https://openwrt.org/docs/guide-user/base-s
 - The image includes `speedtest-go` and `luci-app-speedtest`. LuCI exposes it
   under `Network -> Speed Test`, running the router side speed test client and
   showing its raw output.
-- The image includes `fantastic-keyring` and `fantastic-packages-feeds` so the
-  flashed router can use the third-party `fantastic-packages` repository after
-  boot. This feed is external to ImmortalWrt and should be treated as a trusted
-  third-party source only when you intentionally install packages from it.
 - The Orange Pi CM5 Base has onboard IR hardware wired through PWM input
   capture. The Peripherals IR page treats this as the default onboard
   implementation, shows PWM/counter diagnostics when the kernel exposes them,
