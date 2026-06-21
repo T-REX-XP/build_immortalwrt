@@ -194,6 +194,14 @@ CONFIG_GOLANG_BUILD_CACHE_DIR="/ccache/go-build"
 CFG
 fi
 
+# Third-party feeds (awgopenwrt, openwrt_packages) are compile-time only.
+# They are not published on downloads.immortalwrt.org; disable per-feed apk repos
+# to avoid "unexpected end of file" on apk update (404 HTML served as packages.adb).
+cat >> .config <<'CFG'
+# CONFIG_FEED_awgopenwrt is not set
+# CONFIG_FEED_openwrt_packages is not set
+CFG
+
 make defconfig
 
 profile_config="CONFIG_TARGET_${TARGET}_${SUBTARGET}_DEVICE_${DEVICE}=y"
