@@ -175,6 +175,32 @@ Symptoms match yours when **hostname resolution** fails but **routing works**
 
 Reference: [OpenWrt dnsmasq DNS docs](https://openwrt.org/docs/guide-user/base-system/dhcp.dns).
 
+## USB Wi-Fi hotspot (MT7612U / mt76x2u)
+
+The CM5 image includes **`kmod-mt76x2u`** for USB 802.11ac dongles (MediaTek MT7612U). There is **no onboard Wi-Fi** — the adapter enumerates asynchronously after boot.
+
+### First-boot AP defaults
+
+When a USB radio appears, **`cm5-base-wifi.sh`** configures:
+
+- **5 GHz** primary AP, **VHT80**, ACS on non-DFS channels `36-48 149-165`
+- **WPA3 transition** (`sae-mixed`) with a random PSK
+- Credentials: **`/etc/credentials/cm5-wifi-ap`** (SSID + key)
+- Secondary **2.4 GHz** radio disabled when 5 GHz is available
+- Driver: **`disable_usb_sg=1`** for mt76x2u (USB AP stability)
+
+Plug the dongle into the carrier **USB 3.0** port; confirm with `lsusb -t` (device under `xhci-hcd`).
+
+### Diagnostics
+
+```sh
+cm5-wifi-benchmark
+uci show wireless
+iw dev
+```
+
+Full tuning notes: [immortalwrt/docs/cm5-mt76x2u-hotspot-optimization.md](../immortalwrt/docs/cm5-mt76x2u-hotspot-optimization.md).
+
 ## Optional: fantastic-packages feed
 
 The default CM5 image and `scripts/feeds.conf.cm5` **do not** include the third-party
