@@ -24,7 +24,7 @@ Profile lives in **immortalwrt** source: `target/linux/rockchip/image/armv8.mk`,
 Set before build to fail on missing packages:
 
 ```sh
-IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared blocky luci-app-blocky luci-app-security-guide luci-app-peripherals luci-app-oled luci-app-buttons speedtest-go luci-app-speedtest docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts"
+IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared blocky luci-app-blocky luci-app-security-guide luci-app-peripherals luci-app-oled luci-app-buttons speedtest-go luci-app-speedtest kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts"
 ```
 
 ## Image features (from README)
@@ -35,7 +35,7 @@ IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale clo
 - **luci-app-oled** — SH1106 menu (`oledd`), boot splash, button nav; CM5 HAT uses `/dev/i2c-7`
 - **luci-app-buttons** — hotplug scripts under `/etc/rc.button/`
 - **speedtest-go** + **luci-app-speedtest** — Network → Speed Test
-- **Docker** — rootfs default 512 MiB (`IMMORTALWRT_ROOTFS_PARTSIZE`)
+- **Docker / travelmate / transmission / aria2** — **not** in CM5 profile (removed from `DEVICE_PACKAGES`)
 
 ## Boot media
 

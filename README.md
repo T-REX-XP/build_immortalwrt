@@ -132,7 +132,7 @@ list:
 - The generated config sets `CONFIG_TARGET_ROOTFS_PARTSIZE=512` by default so
   the Docker-enabled CM5 image has enough ext4 rootfs space. Override it with
   `IMMORTALWRT_ROOTFS_PARTSIZE` if you need a different size in MiB.
-- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared blocky luci-app-blocky luci-app-security-guide luci-app-peripherals luci-app-buttons speedtest-go luci-app-speedtest docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts"` if you want
+- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared blocky luci-app-blocky luci-app-security-guide luci-app-peripherals luci-app-oled luci-app-buttons speedtest-go luci-app-speedtest kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts"` if you want
   the build to fail when those packages are missing from the final manifest.
 
 ## Blocky DNS and Wi-Fi client DNS

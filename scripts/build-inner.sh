@@ -209,6 +209,21 @@ CFG
 
 make defconfig
 
+# CM5 profile: keep bittorrent / container stacks out of the image (not in DEVICE_PACKAGES;
+# explicit disable guards against stale .config in the Docker work cache).
+if [[ "$DEVICE" == "xunlong_orangepi-cm5-base" ]]; then
+	for _pkg in \
+		docker dockerd docker-compose luci-app-docker luci-app-dockerman \
+		travelmate luci-app-travelmate \
+		aria2 webui-aria2 luci-app-aria2 \
+		transmission transmission-daemon transmission-cli transmission-remote \
+		transmission-web-control luci-app-transmission
+	do
+		./scripts/config --disable "PACKAGE_${_pkg}" 2>/dev/null || true
+	done
+	make defconfig
+fi
+
 profile_config="CONFIG_TARGET_${TARGET}_${SUBTARGET}_DEVICE_${DEVICE}=y"
 if ! grep -Fxq "$profile_config" .config; then
 	echo "defconfig did not select expected device profile: $profile_config" >&2
