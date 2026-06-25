@@ -24,18 +24,15 @@ Profile lives in **immortalwrt** source: `target/linux/rockchip/image/armv8.mk`,
 Set before build to fail on missing packages:
 
 ```sh
-IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared blocky luci-app-blocky luci-app-security-guide luci-app-peripherals luci-app-oled luci-app-buttons speedtest-go luci-app-speedtest kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts"
+IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled luci-app-buttons kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts"
 ```
 
 ## Image features (from README)
 
-- **Blocky** — `/etc/blocky/config.yml`; first-boot `90-blocky-enable`; Prometheus on port 4000
-- **luci-app-security-guide** — Network → Security Guide
 - **luci-app-peripherals** — IR, PWM fan, I2C diagnostics (not OLED config)
 - **luci-app-oled** — SH1106 menu (`oledd`), boot splash, button nav; CM5 HAT uses `/dev/i2c-7`
 - **luci-app-buttons** — hotplug scripts under `/etc/rc.button/`
-- **speedtest-go** + **luci-app-speedtest** — Network → Speed Test
-- **Docker / travelmate / transmission / aria2** — **not** in CM5 profile (removed from `DEVICE_PACKAGES`)
+- **Docker / travelmate / transmission / aria2 / blocky / speedtest / SMB / DLNA / statistics / SQM** — **not** in CM5 profile (removed from `DEVICE_PACKAGES`)
 
 ## Boot media
 

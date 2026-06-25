@@ -132,10 +132,12 @@ list:
 - The generated config sets `CONFIG_TARGET_ROOTFS_PARTSIZE=512` by default so
   the Docker-enabled CM5 image has enough ext4 rootfs space. Override it with
   `IMMORTALWRT_ROOTFS_PARTSIZE` if you need a different size in MiB.
-- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared blocky luci-app-blocky luci-app-security-guide luci-app-peripherals luci-app-oled luci-app-buttons speedtest-go luci-app-speedtest kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts"` if you want
+- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled luci-app-buttons kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts"` if you want
   the build to fail when those packages are missing from the final manifest.
 
 ## Blocky DNS and Wi-Fi client DNS
+
+> **Note:** Blocky is not in the default CM5 `DEVICE_PACKAGES` profile. Install from the `openwrt-packages` feed if you want it.
 
 - The `blocky` package installs `/etc/blocky/config.yml` into the image. The
   first-boot script at `/etc/uci-defaults/90-blocky-enable` only enables and
@@ -273,9 +275,6 @@ opkg list | grep -i fantastic
   configuration page. It edits hotplug scripts under `/etc/rc.button/`.
 - See `docs/FAN_BUTTON_DIAGNOSTICS.md` for the SSH and LuCI checks used to
   validate PWM fan control and physical button hotplug handling.
-- The image includes `speedtest-go` and `luci-app-speedtest`. LuCI exposes it
-  under `Network -> Speed Test`, running the router side speed test client and
-  showing its raw output.
 - The Orange Pi CM5 Base has onboard IR hardware wired through PWM input
   capture. The Peripherals IR page treats this as the default onboard
   implementation, shows PWM/counter diagnostics when the kernel exposes them,
