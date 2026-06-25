@@ -97,7 +97,7 @@ Default: `scripts/feeds.conf.cm5` — ImmortalWrt `packages`, `luci`, AmneziaWG 
 ## CM5 image assumptions
 
 - LAN: `192.168.8.1/24`, DHCP pool `192.168.8.x`
-- `luci-ssl`, peripherals, **luci-app-oled** (oledd menu), **cm5-button-scripts**, AmneziaWG in profile (no Docker, travelmate, blocky, luci-app-buttons, speedtest, SMB, DLNA, statistics, SQM)
+- `luci-ssl`, peripherals, **luci-app-oled** (oledd menu), **cm5-button-scripts**, AmneziaWG in profile (no Docker, travelmate, blocky, luci-app-buttons, speedtest, SMB, DLNA, statistics, SQM, PBR, watchcat, fwknopd, privoxy)
 - eMMC + microSD: same image; U-Boot tries eMMC first
 - Go bootstrap: `/usr/local/go` in builder image (avoids `golang-bootstrap` on arm64)
 

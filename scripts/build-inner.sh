@@ -219,6 +219,10 @@ if [[ "$DEVICE" == "xunlong_orangepi-cm5-base" ]]; then
 		transmission transmission-daemon transmission-cli transmission-remote \
 		transmission-web-control luci-app-transmission \
 		blocky luci-app-blocky luci-app-security-guide \
+		pbr luci-app-pbr \
+		watchcat luci-app-watchcat \
+		fwknopd luci-app-fwknopd \
+		privoxy luci-app-privoxy \
 		speedtest-go luci-app-speedtest \
 		ksmbd-server luci-app-ksmbd \
 		minidlna luci-app-minidlna \

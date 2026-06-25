@@ -45,9 +45,9 @@ Upstream [ImmortalWrt](https://github.com/immortalwrt/immortalwrt) has **no Oran
 | Boot script | `image/orangepi-cm5-base.bootscript` | `usb-storage.quirks=0e8d:2870:i` for MT7612U installer mode |
 | Kernel config | `armv8/config-6.18` | `CONFIG_SENSORS_PWM_FAN=y` |
 
-**Current `DEVICE_PACKAGES` (slimmed):** platform (`kmod-r8125`, `kmod-hwmon-pwmfan`, buttons), custom feed apps (`luci-app-oled`, `luci-app-peripherals`, `cm5-button-scripts`), LuCI core, USB Wi-Fi stack, VPN/tunnel (WireGuard, AmneziaWG, Tailscale, Cloudflared, PBR), services (fwknopd, privoxy, nlbwmon, watchcat, ttyd).
+**Current `DEVICE_PACKAGES` (slimmed):** platform (`kmod-r8125`, `kmod-hwmon-pwmfan`, buttons), custom feed apps (`luci-app-oled`, `luci-app-peripherals`, `cm5-button-scripts`), LuCI core, USB Wi-Fi stack, VPN/tunnel (WireGuard, AmneziaWG, Tailscale, Cloudflared), services (nlbwmon, ttyd).
 
-**Already removed from image (good):** docker, travelmate, blocky, luci-app-blocky, luci-app-security-guide, speedtest-go, luci-app-speedtest, ksmbd, minidlna, collectd/statistics, SQM.
+**Already removed from image (good):** docker, travelmate, blocky, luci-app-blocky, luci-app-security-guide, speedtest-go, luci-app-speedtest, ksmbd, minidlna, collectd/statistics, SQM, pbr, watchcat, fwknopd, privoxy.
 
 ### 2.2 Kernel & DTS patches
 
