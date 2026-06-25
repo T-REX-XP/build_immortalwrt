@@ -128,9 +128,8 @@ Upstream [ImmortalWrt](https://github.com/immortalwrt/immortalwrt) has **no Oran
 
 | Concern | Repository |
 |---------|------------|
-| `luci-app-oled`, `oledd`, OLED UCI | `openwrt-packages` |
-| `luci-app-peripherals`, `cm5-button-scripts` | `openwrt-packages` |
-| `cm5-button-scripts` | `openwrt-packages` |
+| `luci-app-oled`, `oledd`, OLED UCI (r34 dashboard) | `openwrt-packages` |
+| `luci-app-peripherals` (r19 I2C tab), `cm5-button-scripts` (r3 hotplug chain) | `openwrt-packages` |
 | macOS Docker build, feed wiring, `IMMORTALWRT_EXPECT_PACKAGES` | `build_immortalwrt` |
 | Wiring harness notes | `openwrt-packages/docs/cm5-waveshare-oled-hat-wiring.md` |
 
@@ -156,7 +155,7 @@ Upstream [ImmortalWrt](https://github.com/immortalwrt/immortalwrt) has **no Oran
 | **`97-cm5-apk-feeds`** | Silent sed | Add `logger -t cm5-apk` when lines removed |
 | **Fan PWM** | Patch comment vs `pwm7` in DT | Validate against carrier schematic (PWM13 M1 vs pwm7) |
 | **`kmod-rtl8812au-ct`** | Alt dongle driver | Drop from `DEVICE_PACKAGES` if only MT76x2u is supported |
-| **`docs/cm5-mt76x2u-hotspot-optimization.md`** (396 lines) | Heavy for kernel tree | Move to `build_immortalwrt/docs/` or `openwrt-packages/docs/` |
+| **`docs/cm5-mt76x2u-hotspot-optimization.md`** (396 lines) | Lives in `build_immortalwrt/docs/` | Keep there; link from README |
 
 ### P3 — Optional / long-term
 

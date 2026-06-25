@@ -10,7 +10,9 @@ description: >-
 
 ## Image defaults
 
-- Config baked in: `/etc/blocky/config.yml`
+> **Note:** Blocky is **not** in the default CM5 `DEVICE_PACKAGES` profile. These defaults apply only after installing `blocky` from the `openwrt-packages` feed.
+
+- Config: `/etc/blocky/config.yml` (when package installed)
 - First boot: `/etc/uci-defaults/90-blocky-enable` enables Blocky when init + non-empty YAML exist
 - **DNS port:** `5353` (avoids conflict with dnsmasq on **53**)
 - **HTTP/API + Prometheus:** port `4000` (`/metrics` for luci-app-blocky dashboard)

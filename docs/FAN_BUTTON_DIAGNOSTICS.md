@@ -13,11 +13,14 @@ ssh root@192.168.8.1
 
 Open LuCI at `https://192.168.8.1/`.
 
-- `System -> Peripherals -> PWM fan` should show current fan readings when the
+- `System -> Peripherals -> Cooling fan` should show current fan readings when the
   `pwmfan` hwmon device is present.
+- `System -> Peripherals -> I2C` can scan buses (read-only); OLED configuration is under **Services -> OLED**.
 - `System -> Peripherals -> Diagnostics` can collect a read-only debug report
   that includes button, module, device tree, fan, IR, and log state.
-- `System -> Buttons` provides a focused editor for hotplug button scripts.
+- `Services -> OLED` configures menu mode, button mapping (`menu_nav_button`,
+  `menu_select_button`), and `oledd` service control. Optional feed package
+  `luci-app-buttons` is not in the CM5 image.
 
 If a page reports that no device or script was found, continue with the SSH
 checks below.

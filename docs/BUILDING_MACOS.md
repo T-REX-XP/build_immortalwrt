@@ -36,9 +36,8 @@ Repeated builds are cached by default:
   `.deb` files.
 - `/usr/local/go` in the builder image is used as the external Go bootstrap,
   which is needed for Go packages such as `tailscale` on Apple Silicon.
-- The generated OpenWrt config uses a 512 MiB rootfs partition by default. This
-  leaves enough ext4 space for Docker and can be overridden with
-  `IMMORTALWRT_ROOTFS_PARTSIZE`.
+- The generated OpenWrt config uses a 512 MiB rootfs partition by default. Override with
+  `IMMORTALWRT_ROOTFS_PARTSIZE` if you need a different size in MiB.
 
 ## Recommended CM5 Command
 
@@ -56,23 +55,16 @@ IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale clo
   expose LuCI through the standard OpenWrt web server after first boot.
 - The LAN interface uses `192.168.8.1`; DHCP clients should receive
   `192.168.8.x` addresses from the normal LAN pool.
-- `blocky` installs `/etc/blocky/config.yml` at image build time. On **first boot
-  only**, `/etc/uci-defaults/90-blocky-enable` enables and starts Blocky when
-  `/etc/init.d/blocky` exists and the YAML is non-empty, then applies **`dnsmasq`
-  → Blocky** (`blocky-dnsmasq-sync enable`) so DHCP clients use filtering without extra setup.
-- Blocky listens on DNS port `5353` by default; HTTP/API (and Prometheus metrics)
-  use port `4000`. After first boot you can change forwarding via LuCI **Services → Blocky DNS → Configuration → Router DNS integration** or `/usr/sbin/blocky-dnsmasq-sync`. See the repo **README.md** Blocky section for troubleshooting (“IP ping works, DNS does not”).
-- Prometheus metrics are enabled at `/metrics` on the same HTTP/API listener so
-  the LuCI Blocky dashboard can show overview counters after first boot.
-- `luci-app-security-guide` provides a static `Network -> Security Guide` page
-  with external links for DNS leak, IP, browser leak, ad-block, IPv6, TLS, and
-  firewall exposure checks.
-- `luci-app-peripherals` provides the `System -> Peripherals` UI for infrared
-  receiver/keymap management, PWM fan control, and module diagnostics. Its
-  debug report still includes button state for troubleshooting.
+- `luci-app-peripherals` provides `System -> Peripherals` for infrared
+  receiver/keymap management, PWM fan control, I2C bus scan, and module diagnostics.
 - Physical button hotplug scripts ship in **cm5-button-scripts** (`/etc/rc.button/wps`,
-  `BTN_2`). OLED menu button mapping is in **Services → OLED** (`menu_nav_button`,
-  `menu_select_button`). The optional feed package `luci-app-buttons` is not in the CM5 image.
+  `BTN_2`). Handlers chain `hotplug-call button` so **luci-app-oled** receives presses.
+  OLED menu button mapping is in **Services -> OLED** (`menu_nav_button`,
+  `menu_select_button`). Optional feed package `luci-app-buttons` is not in the CM5 image.
+- `luci-app-oled` provides **Services -> OLED** for `oledd` menu mode, boot splash,
+  I2C/RST, and service control on `/dev/i2c-7`.
+- **Blocky**, **luci-app-security-guide**, and **Docker** are not in the default CM5
+  `DEVICE_PACKAGES` profile — install from the `openwrt-packages` feed if needed.
 - `docs/FAN_BUTTON_DIAGNOSTICS.md` contains the manual SSH and LuCI validation
   steps for PWM fan control and button hotplug support.
 - The onboard CM5 Base IR receiver is wired through PWM input capture, not a

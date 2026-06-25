@@ -54,7 +54,7 @@ LuCI: **System → Peripherals → PWM fan**
 
 ## Button validation
 
-LuCI: **System → Buttons** (edits `/etc/rc.button/`)
+Handlers: `cm5-button-scripts` (`/etc/rc.button/wps`, `BTN_2`). Mapping: **Services → OLED** (not `luci-app-buttons`, which is feed-only).
 
 Package: `cm5-button-scripts` from openwrt-packages feed.
 
@@ -66,9 +66,9 @@ LuCI: **Services → OLED** (config + service control)
 |------|-------------|
 | I2C | `/dev/i2c-7`, address `0x3c` |
 | Daemon | `oledd` when `menu_mode=1` |
-| Diagnostics only | **System → Peripherals → OLED** (i2cdetect) |
+| Diagnostics only | **System → Peripherals → I2C** (`scanI2c` RPC) |
 
-Requires **luci-app-oled r26+** on router for stable menu (ubus crash fixed in r26). Flash from feed build or sysupgrade.
+Requires **luci-app-oled r26+** on router for stable menu (ubus crash fixed in r26); **r34** adds dashboard views. Flash from feed build or sysupgrade.
 
 Skill: `oled-peripherals-cm5` in openwrt-packages.
 

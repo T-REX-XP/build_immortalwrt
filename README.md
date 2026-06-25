@@ -129,9 +129,8 @@ list:
   Set `IMMORTALWRT_DOCKER_PLATFORM=linux/amd64` before the script only if you intend
   to use emulated amd64. After switching platform, run once with `--reset-work-cache`
   so `staging_dir` matches.
-- The generated config sets `CONFIG_TARGET_ROOTFS_PARTSIZE=512` by default so
-  the Docker-enabled CM5 image has enough ext4 rootfs space. Override it with
-  `IMMORTALWRT_ROOTFS_PARTSIZE` if you need a different size in MiB.
+- The generated config sets `CONFIG_TARGET_ROOTFS_PARTSIZE=512` by default.
+  Override it with `IMMORTALWRT_ROOTFS_PARTSIZE` if you need a different size in MiB.
 - Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts"` if you want
   the build to fail when those packages are missing from the final manifest.
 
@@ -201,7 +200,7 @@ uci show wireless
 iw dev
 ```
 
-Full tuning notes: [immortalwrt/docs/cm5-mt76x2u-hotspot-optimization.md](../immortalwrt/docs/cm5-mt76x2u-hotspot-optimization.md).
+Full tuning notes: [docs/cm5-mt76x2u-hotspot-optimization.md](docs/cm5-mt76x2u-hotspot-optimization.md).
 
 ## Optional: fantastic-packages feed
 
@@ -260,17 +259,14 @@ opkg list | grep -i fantastic
   available after first boot.
 - The default LAN address is `192.168.8.1`; DHCP clients on LAN should receive
   `192.168.8.x` addresses from the normal OpenWrt LAN DHCP pool.
-- The default Blocky config enables Prometheus metrics at `/metrics` on the
-  same HTTP/API listener so `luci-app-blocky` can show overview counters without
-  requiring a separate metrics service.
-- The image includes `luci-app-security-guide`, a static LuCI page under
-  `Network -> Security Guide` with external links for DNS leak, IP, WebRTC,
-  ad-block, IPv6, TLS, and firewall exposure checks.
 - The image includes `luci-app-peripherals` under `System -> Peripherals` for
-  infrared receiver/keymap management, PWM fan control, and module diagnostics.
-  Button state is still included in its debug report.
+  infrared receiver/keymap management, PWM fan control, I2C bus scan, and module diagnostics.
+- The image includes `luci-app-oled` under `Services -> OLED` for `oledd` menu mode,
+  boot splash, I2C/RST, and button mapping on `/dev/i2c-7`.
 - Physical button handlers ship in **cm5-button-scripts** (`/etc/rc.button/`).
-  OLED menu button mapping is configured under **Services → OLED** (Menu & buttons).
+  Handlers chain `hotplug-call button` so OLED menu input works with **luci-app-oled**.
+- **Blocky**, **luci-app-security-guide**, and **Docker** are not in the default CM5 profile.
+  Install from the `openwrt-packages` feed when needed (see Blocky DNS section above).
 - See `docs/FAN_BUTTON_DIAGNOSTICS.md` for the SSH and LuCI checks used to
   validate PWM fan control and physical button hotplug handling.
 - The Orange Pi CM5 Base has onboard IR hardware wired through PWM input
