@@ -202,6 +202,7 @@ fi
 # Third-party feeds (awgopenwrt, openwrt_packages) are compile-time only.
 # They are not published on downloads.immortalwrt.org; disable per-feed apk repos
 # to avoid "unexpected end of file" on apk update (404 HTML served as packages.adb).
+# Runtime: target/.../uci-defaults/97-cm5-apk-feeds strips all snapshot repos on CM5.
 cat >> .config <<'CFG'
 # CONFIG_FEED_awgopenwrt is not set
 # CONFIG_FEED_openwrt_packages is not set
