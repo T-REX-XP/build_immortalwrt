@@ -107,12 +107,12 @@ Typical values:
 - `fan1_input` is RPM if a tachometer signal is wired and exposed; it may be
   missing or `0` on fan setups without tach feedback.
 
-Manual fan test:
+Manual fan test (`pwm1_enable` must be set to manual mode **before** writing `pwm1`):
 
 ```sh
 cd /sys/class/hwmon/hwmonX
-echo 255 > pwm1
 echo 2 > pwm1_enable
+echo 255 > pwm1
 sleep 5
 echo 128 > pwm1
 sleep 5
@@ -127,8 +127,8 @@ polarity:
 
 ```sh
 cd /sys/class/hwmon/hwmonX
-echo 0 > pwm1
 echo 2 > pwm1_enable
+echo 0 > pwm1
 sleep 5
 echo 255 > pwm1
 sleep 5
