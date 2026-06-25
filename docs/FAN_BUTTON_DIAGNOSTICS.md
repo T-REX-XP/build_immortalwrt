@@ -170,15 +170,16 @@ Physical buttons need:
 Check installed packages:
 
 ```sh
-apk info | grep -E 'kmod-gpio-button-hotplug|luci-app-buttons|luci-app-peripherals'
+apk info | grep -E 'kmod-gpio-button-hotplug|cm5-button-scripts|luci-app-peripherals|luci-app-oled'
 ```
 
 Expected:
 
 ```text
 kmod-gpio-button-hotplug
-luci-app-buttons
+cm5-button-scripts
 luci-app-peripherals
+luci-app-oled
 ```
 
 Check loaded modules:
@@ -357,7 +358,7 @@ Before flashing a newly built image, verify the manifest contains the required
 packages:
 
 ```sh
-grep -E '^(kmod-hwmon-pwmfan|kmod-gpio-button-hotplug|luci-app-peripherals|luci-app-buttons) ' \
+grep -E '^(kmod-hwmon-pwmfan|kmod-gpio-button-hotplug|luci-app-peripherals|cm5-button-scripts|luci-app-oled) ' \
   bin/targets/rockchip/armv8/immortalwrt-rockchip-armv8-xunlong_orangepi-cm5-base.manifest
 ```
 
@@ -366,8 +367,9 @@ Expected packages:
 ```text
 kmod-gpio-button-hotplug
 kmod-hwmon-pwmfan
-luci-app-buttons
+cm5-button-scripts
 luci-app-peripherals
+luci-app-oled
 ```
 
 If the manifest is correct but the running router is missing files or modules,

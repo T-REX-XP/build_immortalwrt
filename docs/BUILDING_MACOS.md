@@ -43,7 +43,7 @@ Repeated builds are cached by default:
 ## Recommended CM5 Command
 
 ```sh
-IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled luci-app-buttons kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts" \
+IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts" \
 ./scripts/build-immortalwrt-macos.sh \
   --source /Users/t-rex-xp/Documents/immortalwrt \
   --device xunlong_orangepi-cm5-base \
@@ -70,9 +70,9 @@ IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale clo
 - `luci-app-peripherals` provides the `System -> Peripherals` UI for infrared
   receiver/keymap management, PWM fan control, and module diagnostics. Its
   debug report still includes button state for troubleshooting.
-- `luci-app-buttons` provides a focused `System -> Buttons` UI for managing
-  hotplug scripts under `/etc/rc.button/`, similar in placement to the standard
-  LED configuration page.
+- Physical button hotplug scripts ship in **cm5-button-scripts** (`/etc/rc.button/wps`,
+  `BTN_2`). OLED menu button mapping is in **Services → OLED** (`menu_nav_button`,
+  `menu_select_button`). The optional feed package `luci-app-buttons` is not in the CM5 image.
 - `docs/FAN_BUTTON_DIAGNOSTICS.md` contains the manual SSH and LuCI validation
   steps for PWM fan control and button hotplug support.
 - The onboard CM5 Base IR receiver is wired through PWM input capture, not a

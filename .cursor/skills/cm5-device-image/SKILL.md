@@ -24,14 +24,14 @@ Profile lives in **immortalwrt** source: `target/linux/rockchip/image/armv8.mk`,
 Set before build to fail on missing packages:
 
 ```sh
-IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled luci-app-buttons kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts"
+IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts"
 ```
 
 ## Image features (from README)
 
 - **luci-app-peripherals** — IR, PWM fan, I2C diagnostics (not OLED config)
-- **luci-app-oled** — SH1106 menu (`oledd`), boot splash, button nav; CM5 HAT uses `/dev/i2c-7`
-- **luci-app-buttons** — hotplug scripts under `/etc/rc.button/`
+- **luci-app-oled** — SH1106 menu (`oledd`), boot splash, button nav mapping; CM5 HAT uses `/dev/i2c-7`
+- **cm5-button-scripts** — USERKEY/MaskROM hotplug under `/etc/rc.button/` (OLED mapping in luci-app-oled)
 - **Docker / travelmate / transmission / aria2 / blocky / speedtest / SMB / DLNA / statistics / SQM** — **not** in CM5 profile (removed from `DEVICE_PACKAGES`)
 
 ## Boot media

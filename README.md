@@ -132,7 +132,7 @@ list:
 - The generated config sets `CONFIG_TARGET_ROOTFS_PARTSIZE=512` by default so
   the Docker-enabled CM5 image has enough ext4 rootfs space. Override it with
   `IMMORTALWRT_ROOTFS_PARTSIZE` if you need a different size in MiB.
-- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled luci-app-buttons kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts"` if you want
+- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts"` if you want
   the build to fail when those packages are missing from the final manifest.
 
 ## Blocky DNS and Wi-Fi client DNS
@@ -268,11 +268,9 @@ opkg list | grep -i fantastic
   ad-block, IPv6, TLS, and firewall exposure checks.
 - The image includes `luci-app-peripherals` under `System -> Peripherals` for
   infrared receiver/keymap management, PWM fan control, and module diagnostics.
-  Button state is still included in its debug report, but button editing is
-  intentionally handled by the dedicated Buttons app.
-- The image also includes `luci-app-buttons` under `System -> Buttons` for a
-  focused button-management page similar in placement to the standard LED
-  configuration page. It edits hotplug scripts under `/etc/rc.button/`.
+  Button state is still included in its debug report.
+- Physical button handlers ship in **cm5-button-scripts** (`/etc/rc.button/`).
+  OLED menu button mapping is configured under **Services → OLED** (Menu & buttons).
 - See `docs/FAN_BUTTON_DIAGNOSTICS.md` for the SSH and LuCI checks used to
   validate PWM fan control and physical button hotplug handling.
 - The Orange Pi CM5 Base has onboard IR hardware wired through PWM input
