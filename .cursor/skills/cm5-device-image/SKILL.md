@@ -2,7 +2,7 @@
 name: cm5-device-image
 description: >-
   Orange Pi CM5 Base ImmortalWrt image profile, expected packages, LAN defaults,
-  eMMC boot, PWM fan and button diagnostics. Use when editing armv8.mk DEVICE_PACKAGES,
+  eMMC boot, PWM fan, OLED display, and button diagnostics. Use when editing armv8.mk DEVICE_PACKAGES,
   base-files, or validating flashed CM5 images via SSH/LuCI.
 ---
 
@@ -24,14 +24,15 @@ Profile lives in **immortalwrt** source: `target/linux/rockchip/image/armv8.mk`,
 Set before build to fail on missing packages:
 
 ```sh
-IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared blocky luci-app-blocky luci-app-security-guide luci-app-peripherals luci-app-buttons speedtest-go luci-app-speedtest docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts"
+IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared blocky luci-app-blocky luci-app-security-guide luci-app-peripherals luci-app-oled luci-app-buttons speedtest-go luci-app-speedtest docker dockerd luci-app-docker luci-app-dockerman kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts"
 ```
 
 ## Image features (from README)
 
 - **Blocky** — `/etc/blocky/config.yml`; first-boot `90-blocky-enable`; Prometheus on port 4000
 - **luci-app-security-guide** — Network → Security Guide
-- **luci-app-peripherals** — IR, PWM fan, diagnostics (`/dev/i2c-1`, onboard IR via PWM capture)
+- **luci-app-peripherals** — IR, PWM fan, I2C diagnostics (not OLED config)
+- **luci-app-oled** — SH1106 menu (`oledd`), boot splash, button nav; CM5 HAT uses `/dev/i2c-7`
 - **luci-app-buttons** — hotplug scripts under `/etc/rc.button/`
 - **speedtest-go** + **luci-app-speedtest** — Network → Speed Test
 - **Docker** — rootfs default 512 MiB (`IMMORTALWRT_ROOTFS_PARTSIZE`)
@@ -59,6 +60,20 @@ LuCI: **System → Peripherals → PWM fan**
 LuCI: **System → Buttons** (edits `/etc/rc.button/`)
 
 Package: `cm5-button-scripts` from openwrt-packages feed.
+
+## OLED display (Waveshare 1.3" HAT)
+
+LuCI: **Services → OLED** (config + service control)
+
+| Item | CM5 default |
+|------|-------------|
+| I2C | `/dev/i2c-7`, address `0x3c` |
+| Daemon | `oledd` when `menu_mode=1` |
+| Diagnostics only | **System → Peripherals → OLED** (i2cdetect) |
+
+Requires **luci-app-oled r26+** on router for stable menu (ubus crash fixed in r26). Flash from feed build or sysupgrade.
+
+Skill: `oled-peripherals-cm5` in openwrt-packages.
 
 ## Post-build verify
 

@@ -97,7 +97,7 @@ Default: `scripts/feeds.conf.cm5` — ImmortalWrt `packages`, `luci`, AmneziaWG 
 ## CM5 image assumptions
 
 - LAN: `192.168.8.1/24`, DHCP pool `192.168.8.x`
-- `luci-ssl`, Docker, Blocky, peripherals, buttons, speedtest, AmneziaWG in profile
+- `luci-ssl`, Docker, Blocky, peripherals, **luci-app-oled** (oledd menu), buttons, speedtest, AmneziaWG in profile
 - Blocky: DNS **5353**, HTTP/API **4000**; dnsmasq forwards via `blocky-dnsmasq-sync`
 - eMMC + microSD: same image; U-Boot tries eMMC first
 - Go bootstrap: `/usr/local/go` in builder image (avoids `golang-bootstrap` on arm64)
@@ -118,6 +118,8 @@ Default: `scripts/feeds.conf.cm5` — ImmortalWrt `packages`, `luci`, AmneziaWG 
 | `cm5-device-image` | CM5 profile, expected packages, eMMC, fan/button diagnostics |
 | `immortalwrt-feeds-setup` | feeds.conf.cm5, custom-feed, fantastic-packages, all-feeds |
 | `blocky-dns-cm5` | Blocky ports, dnsmasq integration, Wi-Fi DNS troubleshooting |
+
+Cross-repo: **oled-peripherals-cm5** skill lives in `openwrt-packages/.cursor/skills/` (OLED menu, peripherals split, oledd debug).
 
 ## References
 
