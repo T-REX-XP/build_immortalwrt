@@ -272,7 +272,7 @@ rsync -a bin/ /out/
 cp .config /out/.config."$TARGET"."$SUBTARGET"."$DEVICE"
 
 # CM5 Base button packages (merged into IMMORTALWRT_EXPECT_PACKAGES when unset or partial).
-_cm5_button_expect="cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug"
+_cm5_button_expect="cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug luci-app-mcu-display"
 if [[ -z "${IMMORTALWRT_EXPECT_PACKAGES:-}" ]]; then
 	IMMORTALWRT_EXPECT_PACKAGES="$_cm5_button_expect"
 else
