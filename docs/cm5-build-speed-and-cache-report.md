@@ -91,7 +91,7 @@ travelmate luci-app-travelmate
 aria2 webui-aria2 luci-app-aria2
 transmission transmission-daemon transmission-cli transmission-remote
 transmission-web-control luci-app-transmission
-blocky luci-app-blocky luci-app-security-guide
+luci-app-security-guide
 pbr luci-app-pbr
 watchcat luci-app-watchcat
 fwknopd luci-app-fwknopd

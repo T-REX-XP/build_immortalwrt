@@ -224,7 +224,7 @@ if [[ "$DEVICE" == "xunlong_orangepi-cm5-base" ]]; then
 		aria2 webui-aria2 luci-app-aria2 \
 		transmission transmission-daemon transmission-cli transmission-remote \
 		transmission-web-control luci-app-transmission \
-		blocky luci-app-blocky luci-app-security-guide \
+		luci-app-security-guide \
 		pbr luci-app-pbr \
 		watchcat luci-app-watchcat \
 		fwknopd luci-app-fwknopd \
@@ -276,12 +276,12 @@ mkdir -p /out
 rsync -a bin/ /out/
 cp .config /out/.config."$TARGET"."$SUBTARGET"."$DEVICE"
 
-# CM5 Base button packages (merged into IMMORTALWRT_EXPECT_PACKAGES when unset or partial).
-_cm5_button_expect="cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug luci-app-mcu-display"
+# CM5 Base profile packages (merged into IMMORTALWRT_EXPECT_PACKAGES when unset or partial).
+_cm5_profile_expect="cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug luci-app-mcu-display blocky luci-app-blocky"
 if [[ -z "${IMMORTALWRT_EXPECT_PACKAGES:-}" ]]; then
-	IMMORTALWRT_EXPECT_PACKAGES="$_cm5_button_expect"
+	IMMORTALWRT_EXPECT_PACKAGES="$_cm5_profile_expect"
 else
-	for _pkg in $_cm5_button_expect; do
+	for _pkg in $_cm5_profile_expect; do
 		case " ${IMMORTALWRT_EXPECT_PACKAGES} " in
 		*" $_pkg "*) ;;
 		*) IMMORTALWRT_EXPECT_PACKAGES="$IMMORTALWRT_EXPECT_PACKAGES $_pkg" ;;

@@ -131,12 +131,12 @@ list:
   so `staging_dir` matches.
 - The generated config sets `CONFIG_TARGET_ROOTFS_PARTSIZE=512` by default.
   Override it with `IMMORTALWRT_ROOTFS_PARTSIZE` if you need a different size in MiB.
-- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts"` if you want
+- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts blocky luci-app-blocky"` if you want
   the build to fail when those packages are missing from the final manifest.
 
 ## Blocky DNS and Wi-Fi client DNS
 
-> **Note:** Blocky is not in the default CM5 `DEVICE_PACKAGES` profile. Install from the `openwrt-packages` feed if you want it.
+- CM5 `DEVICE_PACKAGES` includes **blocky** and **luci-app-blocky** from the `openwrt_packages` feed (auto-mounted when sibling `openwrt-packages/feeds` exists, or pass `--custom-feed`).
 
 - The `blocky` package installs `/etc/blocky/config.yml` into the image. The
   first-boot script at `/etc/uci-defaults/90-blocky-enable` only enables and
@@ -153,7 +153,7 @@ list:
   The CLI helper `/usr/sbin/blocky-dnsmasq-sync` performs the same `uci` changes.
   Disabling forwarding removes that upstream entry so dnsmasq falls back to normal
   WAN/resolv behaviour.
-- Use **Controls → Refresh lists** (Blocky HTTP API) after editing blocklists in
+- Use **Dashboard → Refresh lists** (Blocky HTTP API) after editing blocklists in
   YAML so Blocky reloads remote lists without a full reboot.
 - **Block lists / upstreams:** edit `config.yml` (upstream resolvers, denylist
   URLs, groups). Save in LuCI and restart Blocky.

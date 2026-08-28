@@ -33,7 +33,7 @@ and copies artifacts to:
 First build or after `--reset-work-cache`:
 
 ```sh
-IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled luci-app-mcu-display cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg yggdrasil luci-proto-yggdrasil" \
+IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled luci-app-mcu-display cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg yggdrasil luci-proto-yggdrasil blocky luci-app-blocky" \
 ./scripts/build-immortalwrt-macos.sh \
   --source /Users/t-rex-xp/Documents/immortalwrt \
   --device xunlong_orangepi-cm5-base \
@@ -99,7 +99,7 @@ well as keeping the image slim):
 | Category | Packages |
 |----------|----------|
 | Containers / media | `docker*`, `aria2`, `transmission*`, `ksmbd*`, `minidlna`, `collectd`, `luci-app-statistics` |
-| Optional feed apps | `blocky`, `luci-app-blocky`, `luci-app-security-guide`, `speedtest-go`, `luci-app-speedtest` |
+| Optional feed apps | `luci-app-security-guide`, `speedtest-go`, `luci-app-speedtest` |
 | Other | `travelmate`, `pbr`, `watchcat`, `fwknopd`, `privoxy`, `sqm-scripts`, … |
 
 `v4l-utils` / `libevdev` are not disabled here — they are omitted because

@@ -10,7 +10,7 @@ description: >-
 
 ## Image defaults
 
-> **Note:** Blocky is **not** in the default CM5 `DEVICE_PACKAGES` profile. These defaults apply only after installing `blocky` from the `openwrt-packages` feed.
+> **Note:** Blocky is in the default CM5 `DEVICE_PACKAGES` profile (`blocky` + `luci-app-blocky` from `openwrt_packages` feed).
 
 - Config: `/etc/blocky/config.yml` (when package installed)
 - First boot: `/etc/uci-defaults/90-blocky-enable` enables Blocky when init + non-empty YAML exist

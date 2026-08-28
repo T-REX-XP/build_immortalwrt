@@ -24,7 +24,7 @@ Profile lives in **immortalwrt** source: `target/linux/rockchip/image/armv8.mk`,
 Set before build to fail on missing packages:
 
 ```sh
-IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts"
+IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts blocky luci-app-blocky"
 ```
 
 ## Image features (from README)
@@ -32,7 +32,8 @@ IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale clo
 - **luci-app-peripherals** — IR, PWM fan, I2C diagnostics (not OLED config)
 - **luci-app-oled** — SH1106 menu (`oledd`), boot splash, button nav mapping; CM5 HAT uses `/dev/i2c-7`
 - **cm5-button-scripts** — USERKEY/MaskROM hotplug under `/etc/rc.button/` (OLED mapping in luci-app-oled)
-- **Docker / travelmate / transmission / aria2 / blocky / speedtest / SMB / DLNA / statistics / SQM / PBR / watchcat / fwknopd / privoxy** — **not** in CM5 profile (removed from `DEVICE_PACKAGES`; `build-inner.sh` explicit disables guard stale `.config`)
+- **blocky** + **luci-app-blocky** — DNS proxy / ad-block; LuCI **Services → Blocky DNS**; first-boot `90-blocky-enable` + dnsmasq forward
+- **Docker / travelmate / transmission / aria2 / speedtest / SMB / DLNA / statistics / SQM / PBR / watchcat / fwknopd / privoxy** — **not** in CM5 profile (removed from `DEVICE_PACKAGES`; `build-inner.sh` explicit disables guard stale `.config`)
 
 ## Boot media
 
