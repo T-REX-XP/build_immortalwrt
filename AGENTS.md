@@ -117,6 +117,7 @@ Default: `scripts/feeds.conf.cm5` — ImmortalWrt `packages`, `luci`, AmneziaWG 
 | `cm5-device-image` | CM5 profile, expected packages, eMMC, fan/button diagnostics |
 | `immortalwrt-feeds-setup` | feeds.conf.cm5, custom-feed, fantastic-packages, all-feeds |
 | `blocky-dns-cm5` | Blocky ports, dnsmasq integration, Wi-Fi DNS troubleshooting |
+| `openwrt-mcp-ssh` | Post-flash / live CM5 checks via MCP or SSH (skill in `openwrt-packages/`) |
 
 Cross-repo: **oled-peripherals-cm5** skill lives in `openwrt-packages/.cursor/skills/` (OLED menu, peripherals split, oledd debug).
 
