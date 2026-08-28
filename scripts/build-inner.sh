@@ -184,12 +184,14 @@ if [[ "$DEVICE" == "xunlong_orangepi-cm5-base" ]]; then
 			"package/feeds/openwrt_packages/${_pkg}" \
 			"package/feeds/luci/${_pkg}"
 	done
-	for _feed_dir in feeds/packages/net/yggdrasil feeds/openwrt_packages/packages/yggdrasil; do
-		if [[ -d "$_feed_dir" ]]; then
+	for _feed_dir in feeds/packages/net/yggdrasil; do
+		if [[ -d "$_feed_dir" && -w "$_feed_dir" ]]; then
 			rm -rf "$_feed_dir"
 			echo "Pruned feed tree (not in CM5 image): $_feed_dir"
 		fi
 	done
+	# openwrt_packages yggdrasil lives on the host-mounted custom feed (often read-only);
+	# unlinking package/feeds/openwrt_packages/yggdrasil above is sufficient.
 	while IFS= read -r -d '' _ygg_build; do
 		echo "Removing cached yggdrasil build tree: $_ygg_build"
 		rm -rf "$_ygg_build"
