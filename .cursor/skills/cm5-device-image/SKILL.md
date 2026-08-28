@@ -33,7 +33,7 @@ IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale clo
 - **luci-app-oled** — SH1106 menu (`oledd`), boot splash, button nav mapping; CM5 HAT uses `/dev/i2c-7`
 - **cm5-button-scripts** — USERKEY/MaskROM hotplug under `/etc/rc.button/` (OLED mapping in luci-app-oled)
 - **blocky** + **luci-app-blocky** — DNS proxy / ad-block; LuCI **Services → Blocky DNS**; first-boot `90-blocky-enable` + dnsmasq forward
-- **Docker / travelmate / transmission / aria2 / speedtest / SMB / DLNA / statistics / SQM / PBR / watchcat / fwknopd / privoxy** — **not** in CM5 profile (removed from `DEVICE_PACKAGES`; `build-inner.sh` explicit disables guard stale `.config`)
+- **Docker / travelmate / transmission / aria2 / yggdrasil / speedtest / SMB / DLNA / statistics / SQM / PBR / watchcat / fwknopd / privoxy** — **not** in CM5 profile (removed from `DEVICE_PACKAGES`; `build-inner.sh` explicit disables guard stale `.config`)
 
 ## Boot media
 

@@ -176,6 +176,26 @@ if [[ -n "${IMMORTALWRT_CUSTOM_FEED:-}" ]] && [[ -d "${IMMORTALWRT_CUSTOM_FEED}/
 	ln -sfn ../../../feeds/openwrt_packages/luci/luci-app-oled package/feeds/openwrt_packages/luci-app-oled
 fi
 
+# CM5: drop yggdrasil from the build tree (ImmortalWrt packages feed + openwrt_packages copy).
+# Not in DEVICE_PACKAGES; stale /work cache must not compile or ship it.
+if [[ "$DEVICE" == "xunlong_orangepi-cm5-base" ]]; then
+	for _pkg in yggdrasil luci-proto-yggdrasil; do
+		rm -f "package/feeds/packages/${_pkg}" \
+			"package/feeds/openwrt_packages/${_pkg}" \
+			"package/feeds/luci/${_pkg}"
+	done
+	for _feed_dir in feeds/packages/net/yggdrasil feeds/openwrt_packages/packages/yggdrasil; do
+		if [[ -d "$_feed_dir" ]]; then
+			rm -rf "$_feed_dir"
+			echo "Pruned feed tree (not in CM5 image): $_feed_dir"
+		fi
+	done
+	while IFS= read -r -d '' _ygg_build; do
+		echo "Removing cached yggdrasil build tree: $_ygg_build"
+		rm -rf "$_ygg_build"
+	done < <(find build_dir/target-* -maxdepth 1 -name 'yggdrasil-*' -print0 2>/dev/null || true)
+fi
+
 echo "=== Selecting target profile ==="
 cat > .config <<CFG
 CONFIG_TARGET_${TARGET}=y
@@ -212,6 +232,7 @@ make defconfig
 
 # CM5 profile: keep bittorrent / container stacks out of the image (not in DEVICE_PACKAGES;
 # explicit disable guards against stale .config in the Docker work cache).
+_cm5_forbidden_packages="yggdrasil luci-proto-yggdrasil"
 if [[ "$DEVICE" == "xunlong_orangepi-cm5-base" ]]; then
 	for _pkg in \
 		docker dockerd docker-compose luci-app-docker luci-app-dockerman \
@@ -220,7 +241,7 @@ if [[ "$DEVICE" == "xunlong_orangepi-cm5-base" ]]; then
 		transmission transmission-daemon transmission-cli transmission-remote \
 		transmission-web-control luci-app-transmission \
 		luci-app-security-guide \
-		yggdrasil luci-proto-yggdrasil \
+		${_cm5_forbidden_packages} \
 		pbr luci-app-pbr \
 		watchcat luci-app-watchcat \
 		fwknopd luci-app-fwknopd \
@@ -232,6 +253,7 @@ if [[ "$DEVICE" == "xunlong_orangepi-cm5-base" ]]; then
 		sqm-scripts luci-app-sqm
 	do
 		./scripts/config --disable "PACKAGE_${_pkg}" 2>/dev/null || true
+		./scripts/config --disable "DEFAULT_${_pkg}" 2>/dev/null || true
 	done
 	make defconfig
 fi
@@ -279,6 +301,16 @@ if [[ -f "$_meson_stamp" ]]; then
 	done < <(find build_dir/target-* -path '*/openwrt-build/meson-private/coredata.dat' -print0 2>/dev/null || true)
 fi
 
+# Serialise Go host toolchain before parallel package compile. Otherwise blocky,
+# cloudflared, tailscale, … can start while hostpkg go-1.27 is still building → "go: command not found".
+if grep -qE '^CONFIG_(DEFAULT_)?(blocky|cloudflared|tailscale)=y' .config 2>/dev/null || \
+   grep -qE '^CONFIG_PACKAGE_(blocky|cloudflared|tailscale)=y' .config 2>/dev/null; then
+	echo "=== Preparing Go host toolchain (sequential) ==="
+	make -j1 V=s \
+		package/feeds/packages/golang/host/compile \
+		package/feeds/packages/golang1.27/host/compile
+fi
+
 echo "=== Building (jobs: $JOBS) ==="
 make -j"$JOBS" V=s
 
@@ -302,6 +334,14 @@ fi
 export IMMORTALWRT_EXPECT_PACKAGES
 
 manifest="$(ls "$TARGET_DIR"/*-"$DEVICE".manifest 2>/dev/null | head -1 || true)"
+if [[ -n "$manifest" && "$DEVICE" == "xunlong_orangepi-cm5-base" ]]; then
+	for pkg in ${_cm5_forbidden_packages}; do
+		if grep -q "^${pkg} " "$manifest"; then
+			echo "Forbidden package present in CM5 manifest: $pkg ($manifest)" >&2
+			exit 1
+		fi
+	done
+fi
 if [[ -n "$manifest" && -n "${IMMORTALWRT_EXPECT_PACKAGES:-}" ]]; then
 	for pkg in ${IMMORTALWRT_EXPECT_PACKAGES//,/ }; do
 		if ! grep -q "^${pkg} " "$manifest"; then

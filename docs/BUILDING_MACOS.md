@@ -93,13 +93,14 @@ for timing estimates, when to reset caches, and log rotation.
 
 ### CM5 packages explicitly disabled at build time
 
-`build-inner.sh` turns these off in `.config` (guards stale Docker work cache as
-well as keeping the image slim):
+`build-inner.sh` turns these off in `.config`, prunes yggdrasil from feed trees on CM5,
+and fails the build if forbidden packages appear in the manifest (guards stale Docker
+work cache as well as keeping the image slim):
 
 | Category | Packages |
 |----------|----------|
 | Containers / media | `docker*`, `aria2`, `transmission*`, `ksmbd*`, `minidlna`, `collectd`, `luci-app-statistics` |
-| Optional feed apps | `luci-app-security-guide`, `speedtest-go`, `luci-app-speedtest` |
+| Optional feed apps | `luci-app-security-guide`, `speedtest-go`, `luci-app-speedtest`, `yggdrasil`, `luci-proto-yggdrasil` |
 | Other | `travelmate`, `pbr`, `watchcat`, `fwknopd`, `privoxy`, `sqm-scripts`, … |
 
 `v4l-utils` / `libevdev` are not disabled here — they are omitted because
