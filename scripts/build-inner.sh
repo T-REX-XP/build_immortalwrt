@@ -170,10 +170,10 @@ fi
 
 rm -rf package/feeds
 ./scripts/feeds install -a
-if [[ -n "${IMMORTALWRT_CUSTOM_FEED:-}" ]] && [[ -d "${IMMORTALWRT_CUSTOM_FEED}/luci/luci-app-oled" ]]; then
-	rm -f package/feeds/luci/luci-app-oled
+if [[ -n "${IMMORTALWRT_CUSTOM_FEED:-}" ]] && [[ -d "${IMMORTALWRT_CUSTOM_FEED}/luci/luci-app-mcu-display" ]]; then
+	rm -f package/feeds/luci/luci-app-mcu-display
 	mkdir -p package/feeds/openwrt_packages
-	ln -sfn ../../../feeds/openwrt_packages/luci/luci-app-oled package/feeds/openwrt_packages/luci-app-oled
+	ln -sfn ../../../feeds/openwrt_packages/luci/luci-app-mcu-display package/feeds/openwrt_packages/luci-app-mcu-display
 fi
 
 # CM5: drop yggdrasil from the build tree (ImmortalWrt packages feed + openwrt_packages copy).

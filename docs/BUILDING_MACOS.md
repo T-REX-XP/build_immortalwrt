@@ -33,7 +33,7 @@ and copies artifacts to:
 First build or after `--reset-work-cache`:
 
 ```sh
-IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled luci-app-mcu-display cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg blocky luci-app-blocky" \
+IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-mcu-display cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg blocky luci-app-blocky" \
 ./scripts/build-immortalwrt-macos.sh \
   --source /Users/t-rex-xp/Documents/immortalwrt \
   --device xunlong_orangepi-cm5-base \
@@ -75,14 +75,13 @@ for timing estimates, when to reset caches, and log rotation.
 ## CM5 image assumptions
 
 - **LuCI:** `luci-ssl` in `DEVICE_PACKAGES`; web UI on `192.168.8.1` after first boot.
-- **Custom feed apps:** `luci-app-oled`, `luci-app-peripherals`, `luci-app-mcu-display`,
+- **Custom feed apps:** `luci-app-mcu-display`, `luci-app-peripherals`,
   `cm5-button-scripts` (requires sibling `openwrt-packages` or `--custom-feed`).
-- **OLED:** **Services → OLED** — `oledd` on `/dev/i2c-7`, boot splash, button mapping.
-- **MCU display:** **Services → MCU display** — ESP32 over debug UART (`ttyS2` default).
+- **MCU display:** **Services → MCU Display** — `mcudd` on debug UART (`/dev/ttyS2` default), boot splash, button mapping.
 - **Peripherals:** **System → Peripherals** — PWM fan, I2C scan, onboard IR via PWM
   capture. `ir-keytable` (`v4l-utils`) is **not** in the image; install with
   `apk add v4l-utils` only if you add an external GPIO IR receiver.
-- **Buttons:** `cm5-button-scripts` + **luci-app-oled** hotplug chain (`/etc/rc.button/wps`, …).
+- **Buttons:** `cm5-button-scripts` + **luci-app-mcu-display** hotplug chain (`/etc/rc.button/wps`, …).
 - **VPN / overlay:** WireGuard, AmneziaWG, Tailscale, Cloudflared.
 - **DNS:** **blocky** + **luci-app-blocky** (from `openwrt_packages` feed).
 - **Not in default image:** yggdrasil, luci-app-security-guide, Docker, SQM, travelmate,
