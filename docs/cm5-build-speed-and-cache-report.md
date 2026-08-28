@@ -147,7 +147,7 @@ refresh via `./scripts/feeds update`.
 | `target/linux/compile` | **85–155 s** | Kernel 6.18 + CM5 DTS |
 | `tools/cmake/compile` | ~95 s | Host tool; cold only |
 | `tools/elfutils/compile` | ~58 s | Host tool; cold only |
-| Go daemons | varies | `tailscale`, `cloudflared`, `yggdrasil` — use Go build cache |
+| Go daemons | varies | `tailscale`, `cloudflared`, `blocky` — use Go build cache |
 
 ---
 

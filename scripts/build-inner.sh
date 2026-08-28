@@ -175,11 +175,6 @@ if [[ -n "${IMMORTALWRT_CUSTOM_FEED:-}" ]] && [[ -d "${IMMORTALWRT_CUSTOM_FEED}/
 	mkdir -p package/feeds/openwrt_packages
 	ln -sfn ../../../feeds/openwrt_packages/luci/luci-app-oled package/feeds/openwrt_packages/luci-app-oled
 fi
-# Prefer custom-feed yggdrasil (newer yggdrasil-go) over ImmortalWrt packages copy.
-if [[ -n "${IMMORTALWRT_CUSTOM_FEED:-}" ]] && [[ -d "${IMMORTALWRT_CUSTOM_FEED}/packages/yggdrasil" ]]; then
-	./scripts/feeds uninstall yggdrasil >/dev/null 2>&1 || true
-	./scripts/feeds install -p openwrt_packages -f yggdrasil
-fi
 
 echo "=== Selecting target profile ==="
 cat > .config <<CFG
@@ -225,6 +220,7 @@ if [[ "$DEVICE" == "xunlong_orangepi-cm5-base" ]]; then
 		transmission transmission-daemon transmission-cli transmission-remote \
 		transmission-web-control luci-app-transmission \
 		luci-app-security-guide \
+		yggdrasil luci-proto-yggdrasil \
 		pbr luci-app-pbr \
 		watchcat luci-app-watchcat \
 		fwknopd luci-app-fwknopd \
@@ -266,6 +262,21 @@ fi
 
 if [[ "${IMMORTALWRT_SKIP_TARGET_BIN_CLEAN:-0}" != "1" ]]; then
 	rm -rf "$TARGET_DIR"
+fi
+
+# Host tools/meson upgrades leave stale target Meson trees in /work (e.g. libevdev via
+# usbutils → libudev-zero). OpenWrt may skip reconfigure and run ninja install against
+# openwrt-build/ configured with an older Meson → hard failure at install time.
+_meson_stamp="staging_dir/host/stamp/.meson_installed"
+if [[ -f "$_meson_stamp" ]]; then
+	while IFS= read -r -d '' _core; do
+		_ob="$(dirname "$(dirname "$_core")")"
+		_pkg="$(dirname "$_ob")"
+		if [[ "$_meson_stamp" -nt "$_core" ]]; then
+			echo "Removing stale Meson package tree: $_pkg (host meson newer than configure)"
+			rm -rf "$_pkg"
+		fi
+	done < <(find build_dir/target-* -path '*/openwrt-build/meson-private/coredata.dat' -print0 2>/dev/null || true)
 fi
 
 echo "=== Building (jobs: $JOBS) ==="

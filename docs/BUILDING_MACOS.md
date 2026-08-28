@@ -33,7 +33,7 @@ and copies artifacts to:
 First build or after `--reset-work-cache`:
 
 ```sh
-IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled luci-app-mcu-display cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg yggdrasil luci-proto-yggdrasil blocky luci-app-blocky" \
+IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled luci-app-mcu-display cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg blocky luci-app-blocky" \
 ./scripts/build-immortalwrt-macos.sh \
   --source /Users/t-rex-xp/Documents/immortalwrt \
   --device xunlong_orangepi-cm5-base \
@@ -66,7 +66,7 @@ even when you omit them from the env var.
   AmneziaWG `awgopenwrt`, plus auto-linked `openwrt_packages`. Optional
   `fantastic-packages` — see [README.md](../README.md).
 - Builder Dockerfile — BuildKit apt cache mounts; `/usr/local/go` bootstrap for
-  Apple Silicon Go packages (`tailscale`, `yggdrasil`, `cloudflared`, …).
+  Apple Silicon Go packages (`tailscale`, `cloudflared`, `blocky`, …).
 - Default rootfs partition: **512 MiB** (`IMMORTALWRT_ROOTFS_PARTSIZE`).
 
 See [cm5-build-speed-and-cache-report.md](cm5-build-speed-and-cache-report.md)
@@ -83,10 +83,10 @@ for timing estimates, when to reset caches, and log rotation.
   capture. `ir-keytable` (`v4l-utils`) is **not** in the image; install with
   `apk add v4l-utils` only if you add an external GPIO IR receiver.
 - **Buttons:** `cm5-button-scripts` + **luci-app-oled** hotplug chain (`/etc/rc.button/wps`, …).
-- **VPN / overlay:** WireGuard, AmneziaWG, Tailscale, Cloudflared, **yggdrasil**
-  (+ `luci-proto-yggdrasil`).
-- **Not in default image:** Blocky, luci-app-security-guide, Docker, SQM, travelmate,
-  speedtest, SMB, DLNA, statistics — install from `openwrt-packages` feed when needed.
+- **VPN / overlay:** WireGuard, AmneziaWG, Tailscale, Cloudflared.
+- **DNS:** **blocky** + **luci-app-blocky** (from `openwrt_packages` feed).
+- **Not in default image:** yggdrasil, luci-app-security-guide, Docker, SQM, travelmate,
+  speedtest, SMB, DLNA, statistics — install from feeds when needed.
 - **eMMC / microSD:** same image; U-Boot tries eMMC first. Remove microSD after
   flashing eMMC to boot from eMMC.
 - **Validation:** [FAN_BUTTON_DIAGNOSTICS.md](FAN_BUTTON_DIAGNOSTICS.md) — fan, buttons, IR.
