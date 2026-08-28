@@ -4,7 +4,7 @@ Use `scripts/build-immortalwrt-macos.sh` to build a dedicated device image from
 any ImmortalWrt source checkout.
 
 ```sh
-cd "/Users/t-rex-xp/Documents/ build_immortalwrt"
+cd "/Users/t-rex-xp/Documents/build_immortalwrt"
 
 ./scripts/build-immortalwrt-macos.sh \
   --source /Users/t-rex-xp/Documents/immortalwrt \
@@ -24,63 +24,94 @@ and copies artifacts to:
 /Users/t-rex-xp/Documents/immortalwrt/bin/targets/rockchip/armv8/
 ```
 
-Repeated builds are cached by default:
+**Custom feed:** if `../openwrt-packages/feeds` exists next to the source tree
+(sibling layout under `Documents/`), the wrapper mounts it automatically as
+`openwrt_packages`. Override with `--custom-feed /path/to/openwrt-packages/feeds`.
 
-- `/dl` is your source download cache.
-- `/work` is a Docker named volume that preserves `build_dir/`, `staging_dir/`,
-  `tmp/`, and feeds between runs.
-- `/ccache` is a Docker named volume used by `CONFIG_CCACHE=y`.
-- `scripts/feeds.conf.cm5` adds the `awgopenwrt` feed for AmneziaWG packages.
-  The third-party `fantastic-packages` feed is optional — see README.md.
-- The Dockerfile uses BuildKit cache mounts for apt metadata and downloaded
-  `.deb` files.
-- `/usr/local/go` in the builder image is used as the external Go bootstrap,
-  which is needed for Go packages such as `tailscale` on Apple Silicon.
-- The generated OpenWrt config uses a 512 MiB rootfs partition by default. Override with
-  `IMMORTALWRT_ROOTFS_PARTSIZE` if you need a different size in MiB.
+## Recommended CM5 command
 
-## Recommended CM5 Command
+First build or after `--reset-work-cache`:
 
 ```sh
-IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts" \
+IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled luci-app-mcu-display cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg yggdrasil luci-proto-yggdrasil" \
 ./scripts/build-immortalwrt-macos.sh \
   --source /Users/t-rex-xp/Documents/immortalwrt \
   --device xunlong_orangepi-cm5-base \
   --dl-dir "$HOME/.cache/immortalwrt-dl"
 ```
 
-## CM5 Image Assumptions
+Routine rebuild (warm `/work`, `/dl`, `/ccache`):
 
-- `luci-ssl` is part of the device package list, so the flashed image should
-  expose LuCI through the standard OpenWrt web server after first boot.
-- The LAN interface uses `192.168.8.1`; DHCP clients should receive
-  `192.168.8.x` addresses from the normal LAN pool.
-- `luci-app-peripherals` provides `System -> Peripherals` for infrared
-  receiver/keymap management, PWM fan control, I2C bus scan, and module diagnostics.
-- Physical button hotplug scripts ship in **cm5-button-scripts** (`/etc/rc.button/wps`,
-  `BTN_2`). Handlers chain `hotplug-call button` so **luci-app-oled** receives presses.
-  OLED menu button mapping is in **Services -> OLED** (`menu_nav_button`,
-  `menu_select_button`). Optional feed package `luci-app-buttons` is not in the CM5 image.
-- `luci-app-oled` provides **Services -> OLED** for `oledd` menu mode, boot splash,
-  I2C/RST, and service control on `/dev/i2c-7`.
-- **Blocky**, **luci-app-security-guide**, and **Docker** are not in the default CM5
-  `DEVICE_PACKAGES` profile — install from the `openwrt-packages` feed if needed.
-- `docs/FAN_BUTTON_DIAGNOSTICS.md` contains the manual SSH and LuCI validation
-  steps for PWM fan control and button hotplug support.
-- The onboard CM5 Base IR receiver is wired through PWM input capture, not a
-  normal GPIO RC receiver. The Peripherals IR page shows this as the default
-  onboard implementation, reports PWM/counter capture diagnostics when
-  available, and keeps `/etc/rc_maps.cfg` editing for external receivers that
-  provide a supported `/sys/class/rc/rc*` device.
-- The CM5 kernel DTS enables eMMC through `sdhci`, and U-Boot is patched to try
-  eMMC before microSD. The generated image is suitable for flashing to either
-  microSD or eMMC; remove the microSD card after flashing eMMC if you want the
-  board to boot from eMMC.
+```sh
+IMMORTALWRT_SKIP_DOWNLOAD=1 \
+./scripts/build-immortalwrt-macos.sh \
+  --source /Users/t-rex-xp/Documents/immortalwrt \
+  --device xunlong_orangepi-cm5-base \
+  --dl-dir "$HOME/.cache/immortalwrt-dl" \
+  --no-build-image
+```
 
-## Cache Control
+`build-inner.sh` always merges `cm5-button-scripts`, `kmod-input-adc-keys`,
+`kmod-button-hotplug`, and `luci-app-mcu-display` into `IMMORTALWRT_EXPECT_PACKAGES`
+even when you omit them from the env var.
 
-Use the defaults for normal rebuilds. To reset build state after large branch
-changes or strange compile errors:
+## Repeated builds and caches
+
+- `/dl` — source tarball cache (`--dl-dir`, default: source `dl/`).
+- `/work` — Docker named volume: `build_dir/`, `staging_dir/`, `tmp/`, and
+  (by default) feed checkouts between runs.
+- `/ccache` — compiler cache (`CONFIG_CCACHE=y`, Go build cache under
+  `/ccache/go-build`).
+- `scripts/feeds.conf.cm5` — minimal feeds: ImmortalWrt `packages`, `luci`,
+  AmneziaWG `awgopenwrt`, plus auto-linked `openwrt_packages`. Optional
+  `fantastic-packages` — see [README.md](../README.md).
+- Builder Dockerfile — BuildKit apt cache mounts; `/usr/local/go` bootstrap for
+  Apple Silicon Go packages (`tailscale`, `yggdrasil`, `cloudflared`, …).
+- Default rootfs partition: **512 MiB** (`IMMORTALWRT_ROOTFS_PARTSIZE`).
+
+See [cm5-build-speed-and-cache-report.md](cm5-build-speed-and-cache-report.md)
+for timing estimates, when to reset caches, and log rotation.
+
+## CM5 image assumptions
+
+- **LuCI:** `luci-ssl` in `DEVICE_PACKAGES`; web UI on `192.168.8.1` after first boot.
+- **Custom feed apps:** `luci-app-oled`, `luci-app-peripherals`, `luci-app-mcu-display`,
+  `cm5-button-scripts` (requires sibling `openwrt-packages` or `--custom-feed`).
+- **OLED:** **Services → OLED** — `oledd` on `/dev/i2c-7`, boot splash, button mapping.
+- **MCU display:** **Services → MCU display** — ESP32 over debug UART (`ttyS2` default).
+- **Peripherals:** **System → Peripherals** — PWM fan, I2C scan, onboard IR via PWM
+  capture. `ir-keytable` (`v4l-utils`) is **not** in the image; install with
+  `apk add v4l-utils` only if you add an external GPIO IR receiver.
+- **Buttons:** `cm5-button-scripts` + **luci-app-oled** hotplug chain (`/etc/rc.button/wps`, …).
+- **VPN / overlay:** WireGuard, AmneziaWG, Tailscale, Cloudflared, **yggdrasil**
+  (+ `luci-proto-yggdrasil`).
+- **Not in default image:** Blocky, luci-app-security-guide, Docker, SQM, travelmate,
+  speedtest, SMB, DLNA, statistics — install from `openwrt-packages` feed when needed.
+- **eMMC / microSD:** same image; U-Boot tries eMMC first. Remove microSD after
+  flashing eMMC to boot from eMMC.
+- **Validation:** [FAN_BUTTON_DIAGNOSTICS.md](FAN_BUTTON_DIAGNOSTICS.md) — fan, buttons, IR.
+
+### CM5 packages explicitly disabled at build time
+
+`build-inner.sh` turns these off in `.config` (guards stale Docker work cache as
+well as keeping the image slim):
+
+| Category | Packages |
+|----------|----------|
+| Containers / media | `docker*`, `aria2`, `transmission*`, `ksmbd*`, `minidlna`, `collectd`, `luci-app-statistics` |
+| Optional feed apps | `blocky`, `luci-app-blocky`, `luci-app-security-guide`, `speedtest-go`, `luci-app-speedtest` |
+| Other | `travelmate`, `pbr`, `watchcat`, `fwknopd`, `privoxy`, `sqm-scripts`, … |
+
+`v4l-utils` / `libevdev` are not disabled here — they are omitted because
+`luci-app-peripherals` no longer depends on `v4l-utils` (see `openwrt-packages` feed).
+Install `v4l-utils` on-router only when using an external GPIO IR receiver.
+
+## Cache control
+
+Use defaults for normal rebuilds. **Avoid `--reset-work-cache` on every run** — it
+forces a multi-hour cold compile.
+
+Reset work tree after branch/platform changes or `Missing kernel version/hash file`:
 
 ```sh
 ./scripts/build-immortalwrt-macos.sh \
@@ -97,7 +128,7 @@ Reset compiler cache too:
   --reset-ccache
 ```
 
-Disable persistent work cache for a one-off clean build:
+One-off clean build without persistent volumes:
 
 ```sh
 ./scripts/build-immortalwrt-macos.sh \
@@ -108,24 +139,25 @@ Disable persistent work cache for a one-off clean build:
 
 ## Debugging
 
-To validate profile selection without compiling:
+Validate profile selection without compiling:
 
 ```sh
 IMMORTALWRT_STOP_AFTER_CONFIG=1 \
 ./scripts/build-immortalwrt-macos.sh --source /Users/t-rex-xp/Documents/immortalwrt
 ```
 
-To get a simpler build log:
+Simpler build log:
 
 ```sh
 IMMORTALWRT_MAKE_JOBS=1 \
 ./scripts/build-immortalwrt-macos.sh --source /Users/t-rex-xp/Documents/immortalwrt
 ```
 
-The default log is written to:
+Default log (append mode):
 
 ```text
 <out-dir>/immortalwrt-build.log
 ```
 
-where `<out-dir>` defaults to the source tree's `bin/` directory.
+`<out-dir>` defaults to the source tree's `bin/` directory. Archive when large —
+see the speed report.
