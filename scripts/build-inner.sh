@@ -175,6 +175,11 @@ if [[ -n "${IMMORTALWRT_CUSTOM_FEED:-}" ]] && [[ -d "${IMMORTALWRT_CUSTOM_FEED}/
 	mkdir -p package/feeds/openwrt_packages
 	ln -sfn ../../../feeds/openwrt_packages/luci/luci-app-oled package/feeds/openwrt_packages/luci-app-oled
 fi
+# Prefer custom-feed yggdrasil (newer yggdrasil-go) over ImmortalWrt packages copy.
+if [[ -n "${IMMORTALWRT_CUSTOM_FEED:-}" ]] && [[ -d "${IMMORTALWRT_CUSTOM_FEED}/packages/yggdrasil" ]]; then
+	./scripts/feeds uninstall yggdrasil >/dev/null 2>&1 || true
+	./scripts/feeds install -p openwrt_packages -f yggdrasil
+fi
 
 echo "=== Selecting target profile ==="
 cat > .config <<CFG
