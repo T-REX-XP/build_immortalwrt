@@ -234,7 +234,7 @@ make defconfig
 
 # CM5 profile: keep bittorrent / container stacks out of the image (not in DEVICE_PACKAGES;
 # explicit disable guards against stale .config in the Docker work cache).
-_cm5_forbidden_packages="yggdrasil luci-proto-yggdrasil"
+_cm5_forbidden_packages="yggdrasil luci-proto-yggdrasil snort3 luci-app-snort3 suricata suricata-etopen tp-eventd luci-app-threat-prevention"
 if [[ "$DEVICE" == "xunlong_orangepi-cm5-base" ]]; then
 	for _pkg in \
 		docker dockerd docker-compose luci-app-docker luci-app-dockerman \
