@@ -199,11 +199,16 @@ if [[ "$DEVICE" == "xunlong_orangepi-cm5-base" ]]; then
 fi
 
 echo "=== Selecting target profile ==="
+if [[ "$DEVICE" == "xunlong_orangepi-cm5-base" ]]; then
+	_rootfs="${IMMORTALWRT_ROOTFS_PARTSIZE:-768}"
+else
+	_rootfs="${IMMORTALWRT_ROOTFS_PARTSIZE:-512}"
+fi
 cat > .config <<CFG
 CONFIG_TARGET_${TARGET}=y
 CONFIG_TARGET_${TARGET}_${SUBTARGET}=y
 CONFIG_TARGET_${TARGET}_${SUBTARGET}_DEVICE_${DEVICE}=y
-CONFIG_TARGET_ROOTFS_PARTSIZE=${IMMORTALWRT_ROOTFS_PARTSIZE:-512}
+CONFIG_TARGET_ROOTFS_PARTSIZE=${_rootfs}
 # CONFIG_TARGET_MULTI_PROFILE is not set
 CFG
 
@@ -234,7 +239,7 @@ make defconfig
 
 # CM5 profile: keep bittorrent / container stacks out of the image (not in DEVICE_PACKAGES;
 # explicit disable guards against stale .config in the Docker work cache).
-_cm5_forbidden_packages="yggdrasil luci-proto-yggdrasil snort3 luci-app-snort3 suricata suricata-etopen tp-eventd luci-app-threat-prevention"
+_cm5_forbidden_packages="yggdrasil luci-proto-yggdrasil"
 if [[ "$DEVICE" == "xunlong_orangepi-cm5-base" ]]; then
 	for _pkg in \
 		docker dockerd docker-compose luci-app-docker luci-app-dockerman \
@@ -313,6 +318,12 @@ if grep -qE '^CONFIG_(DEFAULT_)?(blocky|cloudflared|tailscale)=y' .config 2>/dev
 		package/feeds/packages/golang1.27/host/compile
 fi
 
+# Suricata needs rustc/cargo before parallel package compile.
+if grep -qE '^CONFIG_PACKAGE_suricata=y' .config 2>/dev/null; then
+	echo "=== Preparing Rust host toolchain (sequential) ==="
+	make -j1 V=s package/feeds/packages/rust/host/compile
+fi
+
 echo "=== Building (jobs: $JOBS) ==="
 make -j"$JOBS" V=s
 
@@ -322,7 +333,7 @@ rsync -a bin/ /out/
 cp .config /out/.config."$TARGET"."$SUBTARGET"."$DEVICE"
 
 # CM5 Base profile packages (merged into IMMORTALWRT_EXPECT_PACKAGES when unset or partial).
-_cm5_profile_expect="cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug luci-app-mcu-display blocky luci-app-blocky openssh-sftp-server picocom screen socat"
+_cm5_profile_expect="cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug luci-app-mcu-display blocky luci-app-blocky openssh-sftp-server picocom screen socat snort3 luci-app-snort3 libdaq3 kmod-nft-queue suricata suricata-etopen tp-eventd luci-app-threat-prevention"
 if [[ -z "${IMMORTALWRT_EXPECT_PACKAGES:-}" ]]; then
 	IMMORTALWRT_EXPECT_PACKAGES="$_cm5_profile_expect"
 else
@@ -367,7 +378,7 @@ if [[ "$DEVICE" == "xunlong_orangepi-cm5-base" ]]; then
 				echo
 				echo "## This build (package versions)"
 				echo
-				grep -E '^(mcudd |luci-app-mcu-display |luci-app-peripherals |luci-app-blocky |blocky |cm5-button-scripts |openssh-sftp-server |picocom |screen |socat |kmod-r8125 |kmod-hwmon-pwmfan )' "$manifest" || true
+				grep -E '^(mcudd |luci-app-mcu-display |luci-app-peripherals |luci-app-blocky |blocky |cm5-button-scripts |openssh-sftp-server |picocom |screen |socat |kmod-r8125 |kmod-hwmon-pwmfan |snort3 |luci-app-snort3 |libdaq3 |kmod-nft-queue |suricata |suricata-etopen |tp-eventd |luci-app-threat-prevention )' "$manifest" || true
 			fi
 		} | tee "$TARGET_DIR/$_notes_name" > "$_notes_out"
 		echo "Copied CM5 release notes: $_notes_out"
