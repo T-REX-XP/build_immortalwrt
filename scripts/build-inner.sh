@@ -322,7 +322,7 @@ rsync -a bin/ /out/
 cp .config /out/.config."$TARGET"."$SUBTARGET"."$DEVICE"
 
 # CM5 Base profile packages (merged into IMMORTALWRT_EXPECT_PACKAGES when unset or partial).
-_cm5_profile_expect="cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug luci-app-mcu-display blocky luci-app-blocky"
+_cm5_profile_expect="cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug luci-app-mcu-display blocky luci-app-blocky openssh-sftp-server"
 if [[ -z "${IMMORTALWRT_EXPECT_PACKAGES:-}" ]]; then
 	IMMORTALWRT_EXPECT_PACKAGES="$_cm5_profile_expect"
 else

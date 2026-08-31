@@ -24,7 +24,7 @@ Profile lives in **immortalwrt** source: `target/linux/rockchip/image/armv8.mk`,
 Set before build to fail on missing packages:
 
 ```sh
-IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts blocky luci-app-blocky"
+IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts blocky luci-app-blocky openssh-sftp-server"
 ```
 
 ## Image features (from README)
