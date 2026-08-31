@@ -33,7 +33,7 @@ and copies artifacts to:
 First build or after `--reset-work-cache`:
 
 ```sh
-IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-mcu-display cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg blocky luci-app-blocky openssh-sftp-server" \
+IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-mcu-display cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg blocky luci-app-blocky openssh-sftp-server picocom screen socat" \
 ./scripts/build-immortalwrt-macos.sh \
   --source /Users/t-rex-xp/Documents/immortalwrt \
   --device xunlong_orangepi-cm5-base \
@@ -52,9 +52,9 @@ IMMORTALWRT_SKIP_DOWNLOAD=1 \
 ```
 
 `build-inner.sh` always merges `cm5-button-scripts`, `kmod-input-adc-keys`,
-`kmod-button-hotplug`, `luci-app-mcu-display`, `blocky`, `luci-app-blocky`, and
-`openssh-sftp-server` into `IMMORTALWRT_EXPECT_PACKAGES` even when you omit them
-from the env var.
+`kmod-button-hotplug`, `luci-app-mcu-display`, `blocky`, `luci-app-blocky`,
+`openssh-sftp-server`, `picocom`, `screen`, and `socat` into
+`IMMORTALWRT_EXPECT_PACKAGES` even when you omit them from the env var.
 
 ## Repeated builds and caches
 

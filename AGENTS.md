@@ -119,7 +119,7 @@ Default: `scripts/feeds.conf.cm5` — ImmortalWrt `packages`, `luci`, AmneziaWG 
 | `blocky-dns-cm5` | Blocky ports, dnsmasq integration, Wi-Fi DNS troubleshooting |
 | `openwrt-mcp-ssh` | Post-flash / live CM5 checks via MCP or SSH (skill in `openwrt-packages/`) |
 
-Cross-repo: **mcu-display-cm5** in `openwrt-packages/.cursor/skills/` (orig C mcudd, LuCI sidecar, ESP32 UART). **esp32-cm5-router-fw** in `esp32-smartdisplay-demo`. Peripherals I2C/fan: **oled-peripherals-cm5**.
+Cross-repo: **mcu-display-cm5** and **cm5-mcu-serial** in `openwrt-packages/.cursor/skills/` (orig C mcudd, LuCI sidecar, picocom/socat on `ttyS2`). **esp32-cm5-router-fw** in `esp32-smartdisplay-demo`. Peripherals I2C/fan: **oled-peripherals-cm5**.
 
 ## References
 

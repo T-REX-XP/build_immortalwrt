@@ -131,7 +131,7 @@ list:
   so `staging_dir` matches.
 - The generated config sets `CONFIG_TARGET_ROOTFS_PARTSIZE=512` by default.
   Override it with `IMMORTALWRT_ROOTFS_PARTSIZE` if you need a different size in MiB.
-- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts blocky luci-app-blocky openssh-sftp-server"` if you want
+- Set `IMMORTALWRT_EXPECT_PACKAGES="kmod-r8125 kmod-hwmon-pwmfan luci-ssl tailscale cloudflared luci-app-tailscale-community luci-app-cloudflared luci-app-peripherals luci-app-oled kmod-wireguard wireguard-tools luci-proto-wireguard rpcd-mod-wireguard kmod-amneziawg amneziawg-tools luci-proto-amneziawg cm5-button-scripts blocky luci-app-blocky openssh-sftp-server picocom screen socat"` if you want
   the build to fail when those packages are missing from the final manifest.
 
 ## Blocky DNS and Wi-Fi client DNS
