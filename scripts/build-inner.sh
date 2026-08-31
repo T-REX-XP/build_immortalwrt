@@ -355,4 +355,23 @@ fi
 
 bash /scripts/verify-kernel-modules.sh "$IWRT"
 
+if [[ "$DEVICE" == "xunlong_orangepi-cm5-base" ]]; then
+	_notes_src="$IWRT/target/linux/rockchip/armv8/base-files/usr/share/cm5/RELEASE_NOTES.md"
+	_notes_name="immortalwrt-${TARGET}-${SUBTARGET}-${DEVICE}.RELEASE_NOTES.md"
+	_notes_out="/out/targets/$TARGET/$SUBTARGET/$_notes_name"
+	if [[ -f "$_notes_src" ]]; then
+		mkdir -p "/out/targets/$TARGET/$SUBTARGET" "$TARGET_DIR"
+		{
+			cat "$_notes_src"
+			if [[ -n "$manifest" && -f "$manifest" ]]; then
+				echo
+				echo "## This build (package versions)"
+				echo
+				grep -E '^(mcudd |luci-app-mcu-display |luci-app-peripherals |luci-app-blocky |blocky |cm5-button-scripts |openssh-sftp-server |picocom |screen |socat |kmod-r8125 |kmod-hwmon-pwmfan )' "$manifest" || true
+			fi
+		} | tee "$TARGET_DIR/$_notes_name" > "$_notes_out"
+		echo "Copied CM5 release notes: $_notes_out"
+	fi
+fi
+
 echo "=== Done. Images are under /out/targets/$TARGET/$SUBTARGET ==="
