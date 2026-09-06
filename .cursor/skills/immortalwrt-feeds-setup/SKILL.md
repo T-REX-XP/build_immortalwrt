@@ -79,8 +79,8 @@ To enable for firmware builds:
 On running router:
 
 ```sh
-opkg install fantastic-keyring fantastic-packages-feeds
-opkg update
+apk add fantastic-keyring fantastic-packages-feeds
+apk update
 ```
 
 Treat as trusted third-party source only when intended.

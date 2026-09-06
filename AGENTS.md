@@ -113,6 +113,7 @@ Default: `scripts/feeds.conf.cm5` — ImmortalWrt `packages`, `luci`, AmneziaWG 
 
 | Skill | When to use |
 |-------|-------------|
+| `openwrt-25x` | ImmortalWrt 25.x apk vs opkg; kernel 6.12 vs CM5 rockchip 6.18 (skills in immortalwrt / openwrt-packages) |
 | `immortalwrt-macos-build` | Running builds, caches, Docker platform, debugging |
 | `cm5-device-image` | CM5 profile, expected packages, eMMC, fan/button diagnostics |
 | `immortalwrt-feeds-setup` | feeds.conf.cm5, custom-feed, fantastic-packages, all-feeds |

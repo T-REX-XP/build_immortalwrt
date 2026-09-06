@@ -63,7 +63,7 @@ If Blocky crash-loops with YAML errors after upgrade (conffile preserved):
 ```sh
 /etc/init.d/blocky stop
 # Restore clean template from package or reinstall blocky
-opkg reinstall blocky
+apk add -u --force-reinstall blocky
 /etc/init.d/blocky start
 ```
 

@@ -170,10 +170,17 @@ fi
 
 rm -rf package/feeds
 ./scripts/feeds install -a
-if [[ -n "${IMMORTALWRT_CUSTOM_FEED:-}" ]] && [[ -d "${IMMORTALWRT_CUSTOM_FEED}/luci/luci-app-mcu-display" ]]; then
-	rm -f package/feeds/luci/luci-app-mcu-display
+if [[ -n "${IMMORTALWRT_CUSTOM_FEED:-}" ]]; then
 	mkdir -p package/feeds/openwrt_packages
-	ln -sfn ../../../feeds/openwrt_packages/luci/luci-app-mcu-display package/feeds/openwrt_packages/luci-app-mcu-display
+	if [[ -d "${IMMORTALWRT_CUSTOM_FEED}/luci/luci-app-mcu-display" ]]; then
+		rm -f package/feeds/luci/luci-app-mcu-display
+		ln -sfn ../../../feeds/openwrt_packages/luci/luci-app-mcu-display package/feeds/openwrt_packages/luci-app-mcu-display
+	fi
+	# Prefer this feed's snort3 (CM5 UCI) over ImmortalWrt packages/net/snort3.
+	if [[ -d "${IMMORTALWRT_CUSTOM_FEED}/packages/snort3" ]]; then
+		rm -f package/feeds/packages/snort3
+		ln -sfn ../../../feeds/openwrt_packages/packages/snort3 package/feeds/openwrt_packages/snort3
+	fi
 fi
 
 # CM5: drop yggdrasil from the build tree (ImmortalWrt packages feed + openwrt_packages copy).
@@ -333,7 +340,7 @@ rsync -a bin/ /out/
 cp .config /out/.config."$TARGET"."$SUBTARGET"."$DEVICE"
 
 # CM5 Base profile packages (merged into IMMORTALWRT_EXPECT_PACKAGES when unset or partial).
-_cm5_profile_expect="cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug luci-app-mcu-display blocky luci-app-blocky openssh-sftp-server picocom screen socat snort3 luci-app-snort3 libdaq3 kmod-nft-queue suricata suricata-etopen tp-eventd luci-app-threat-prevention"
+_cm5_profile_expect="cm5-button-scripts kmod-input-adc-keys kmod-button-hotplug luci-app-mcu-display blocky luci-app-blocky openssh-sftp-server picocom screen socat snort3 luci-app-snort3 libdaq3 kmod-nft-queue suricata suricata-etopen tp-eventd luci-app-suricata"
 if [[ -z "${IMMORTALWRT_EXPECT_PACKAGES:-}" ]]; then
 	IMMORTALWRT_EXPECT_PACKAGES="$_cm5_profile_expect"
 else
@@ -378,7 +385,7 @@ if [[ "$DEVICE" == "xunlong_orangepi-cm5-base" ]]; then
 				echo
 				echo "## This build (package versions)"
 				echo
-				grep -E '^(mcudd |luci-app-mcu-display |luci-app-peripherals |luci-app-blocky |blocky |cm5-button-scripts |openssh-sftp-server |picocom |screen |socat |kmod-r8125 |kmod-hwmon-pwmfan |snort3 |luci-app-snort3 |libdaq3 |kmod-nft-queue |suricata |suricata-etopen |tp-eventd |luci-app-threat-prevention )' "$manifest" || true
+				grep -E '^(mcudd |luci-app-mcu-display |luci-app-peripherals |luci-app-blocky |blocky |cm5-button-scripts |openssh-sftp-server |picocom |screen |socat |kmod-r8125 |kmod-hwmon-pwmfan |snort3 |luci-app-snort3 |libdaq3 |kmod-nft-queue |suricata |suricata-etopen |tp-eventd |luci-app-suricata )' "$manifest" || true
 			fi
 		} | tee "$TARGET_DIR/$_notes_name" > "$_notes_out"
 		echo "Copied CM5 release notes: $_notes_out"
